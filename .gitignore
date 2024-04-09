@@ -1,0 +1,20 @@
+# Python bytecode files
+*.pyc
+__pycache__/
+
+# Compiled QML files
+*.qmlc
+
+# Qt project user settings
+*.pro.user
+*.pro.user.*
+
+# Visual Studio project files
+*.pyproj
+*.suo
+
+# JetBrains IDE project files
+*.idea/
+
+# Visual Studio Code project files
+*.vscode/
