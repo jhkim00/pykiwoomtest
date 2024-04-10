@@ -12,9 +12,27 @@ class ConditionController(QObject):
         self.qmlContext.setContextProperty('conditionController', self)
         self.km = kiwoomManager
 
+        self._currentCondition = {'code': '', 'name': ''}
         self._conditionList = list()
         self._getConditionList()
-        logger.debug(self._conditionList)
+
+    currentConditionChanged = pyqtSignal()
+
+    @pyqtProperty(QVariant)
+    def currentCondition(self):
+        return self._currentCondition
+
+    @currentCondition.setter
+    def currentCondition(self, condition: dict):
+        logger.debug(f'condition: {condition}')
+        if isinstance(condition, dict):
+            self._currentCondition = condition
+        else:
+            self._currentCondition = condition.toVariant()
+
+        logger.debug(f'self._currentCondition: {self._currentCondition}')
+        logger.debug(f"name: {self._currentCondition['name']}, code: {self._currentCondition['code']}")
+        self.currentConditionChanged.emit()
 
     @property
     def conditionList(self):

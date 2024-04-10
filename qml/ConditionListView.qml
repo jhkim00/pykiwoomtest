@@ -43,14 +43,14 @@ ListView {
     delegate: Rectangle {
         id: listViewItem
         width: root.width
-        height: 50
+        height: 30
         border.color: 'black'
         border.width: 1
 
         Item {
             x: 10
             width: parent.width - x
-            height: 18
+            height: parent.height
             Text {
                 id: listViewItemTextName
                 anchors.verticalCenter: parent.verticalCenter
@@ -64,6 +64,8 @@ ListView {
             anchors.fill: parent
             onClicked: {
                 root.itemClicked(modelData)
+
+                root.currentIndex = index
             }
         }
 
