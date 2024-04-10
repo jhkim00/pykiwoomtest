@@ -6,7 +6,7 @@ ApplicationWindow {
     visible: true
     width: 800
     height: 480
-    title: "My Application"
+    title: "pykiwoomtest"
 
     StockInfo {
         id: stockInfo
@@ -14,7 +14,7 @@ ApplicationWindow {
         height: 100
     }
 
-    StockListView {
+    SearchStockListView {
         anchors.top: stockInfo.bottom
         width: 240
         height: parent.height - stockInfo.height
