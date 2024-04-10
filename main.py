@@ -7,7 +7,12 @@ from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import Qt
 
 import sys
+import logging
 from functools import partial
+
+import mainController
+
+logger = logging.getLogger()
 
 
 def _handleQmlWarnings(warnings):
@@ -16,7 +21,7 @@ def _handleQmlWarnings(warnings):
 
 
 def _onMainWindowClosed(sender, close_):
-    print('onMainWindowClosed')
+    logger.debug('onMainWindowClosed')
     for rootObj in engine.rootObjects():
         if rootObj != sender:
             print('onMainWindowClosed 1')
@@ -27,12 +32,26 @@ def _onMainWindowClosed(sender, close_):
 
 
 if __name__ == "__main__":
+    rootLogger = logging.getLogger()
+    rootLogger.setLevel(logging.DEBUG)
+    rootLogger.propagate = 0
+    formatter = logging.Formatter('[%(asctime)s][%(levelname)s][%(thread)d][%(filename)s:%(funcName)s:%(lineno)d]'
+                                  ' %(message)s')
+    streamHandler = logging.StreamHandler()
+    streamHandler.setFormatter(formatter)
+    rootLogger.addHandler(streamHandler)
+
     app = QApplication(sys.argv)
 
     engine = QQmlApplicationEngine()
     engine.warnings.connect(_handleQmlWarnings)
-    engine.load(QUrl.fromLocalFile("Main.qml"))
-    engine.load(QUrl.fromLocalFile("Sub.qml"))
+
+    mainController = mainController.MainController(app)
+    mainController.qmlContext = engine.rootContext()
+    engine.rootContext().setContextProperty('mainController', mainController)
+
+    engine.load(QUrl.fromLocalFile("qml/Main.qml"))
+    engine.load(QUrl.fromLocalFile("qml/Sub.qml"))
 
     if not engine.rootObjects():
         sys.exit(-1)
