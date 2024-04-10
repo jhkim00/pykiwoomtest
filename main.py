@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 
 import sys
 import logging
+import time
 from functools import partial
 
 import mainController
@@ -51,10 +52,11 @@ if __name__ == "__main__":
     engine.rootContext().setContextProperty('mainController', mainController)
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
-    engine.load(QUrl.fromLocalFile("qml/Sub.qml"))
 
     if not engine.rootObjects():
         sys.exit(-1)
+
+    # engine.rootObjects()[0].raise()
 
     # # QQuickView 생성
     # view = QQuickView()
@@ -68,5 +70,7 @@ if __name__ == "__main__":
 
     main_window = engine.rootObjects()[0]
     main_window.closing.connect(partial(_onMainWindowClosed, main_window))
+
+    mainController.login()
 
     sys.exit(app.exec_())

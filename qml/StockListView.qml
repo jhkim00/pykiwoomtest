@@ -2,12 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
-ApplicationWindow {
+Rectangle {
     id: root
-    visible: true
-    width: 240
-    height: 480
-    title: "Stock List"
 
     property string stockName: ""
     property string stockCode: ""
@@ -19,9 +15,11 @@ ApplicationWindow {
     function setStock(stock) {
         console.log("setStock")
         if (typeof(stock) !== 'undefined') {
+            mainController.currentStock = stock
+
             root.stockName = stock["name"]
             root.stockCode = stock["code"]
-            console.log("setStock stock:" + stock)
+            console.log("setStock name:%1, code:%2".arg(stock["name"]).arg(stock["code"]))
             textFieldInput.text = stock["name"]
             root.inputTextCompleted()
         }
@@ -32,9 +30,11 @@ ApplicationWindow {
         width: parent.width
         height: 50
         placeholderText: "종목명 or 종목코드"
+        textColor: 'black'
         style: TextFieldStyle {
             background: Rectangle {
                 radius: 4
+                color: 'lightgray'
                 border.color: 'black'
                 border.width: 2
             }

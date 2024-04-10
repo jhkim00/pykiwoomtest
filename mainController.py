@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 import pykiwoom
 import time
@@ -9,17 +9,14 @@ logger = logging.getLogger()
 class MainController(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.qmlContext = None
         self.km = None
-        self._test = 'test'
         self.codeList = None
         self._codeMasterList = list()
-        self.codeMasterDict = dict()
         self._searchedStockList = list()
-        self.qmlContext = None
+        self._currentStock = {'code': '', 'name': ''}
 
-    @pyqtProperty(str)
-    def test(self):
-        return self._test
+    currentStockChanged = pyqtSignal()
 
     @property
     def codeMasterList(self):
@@ -33,6 +30,22 @@ class MainController(QObject):
     def searchedStockList(self, stockList: list):
         self._searchedStockList = stockList
         self.qmlContext.setContextProperty("searchedStockList", self._searchedStockList)
+
+    @pyqtProperty(QVariant)
+    def currentStock(self):
+        return self._currentStock
+
+    @currentStock.setter
+    def currentStock(self, stock: dict):
+        logger.debug(f'stock: {stock}')
+        if isinstance(stock, dict):
+            self._currentStock = stock
+        else:
+            self._currentStock = stock.toVariant()
+
+        logger.debug(f'self._currentStock: {self._currentStock}')
+        logger.debug(f"name: {self._currentStock['name']}, code: {self._currentStock['code']}")
+        self.currentStockChanged.emit()
 
     @pyqtSlot()
     def login(self):
@@ -61,15 +74,15 @@ class MainController(QObject):
         kospi = km.get_method()
         kosdaq = km.get_method()
         self.codeList = kospi + kosdaq
-        # logger.debug(self.codeList)
+
         for code in self.codeList:
             km.put_method(('GetMasterCodeName', code))
             masterName = km.get_method()
             self._codeMasterList.append({'code': code, 'name': masterName})
-            # self.codeMasterDict[code] = masterName
 
         # logger.debug(self._codeMasterList)
 
+        self.currentStock = self.codeMasterList[0]
         self.searchedStockList = self.codeMasterList
 
         self.qmlContext.setContextProperty('codeMasterList', self.codeMasterList)
