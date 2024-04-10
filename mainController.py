@@ -1,17 +1,18 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 import pykiwoom
-import time
 
 logger = logging.getLogger()
 
 
 class MainController(QObject):
-    def __init__(self, parent=None):
+    def __init__(self, qmlContext, parent=None):
         super().__init__(parent)
-        self.qmlContext = None
+        self.qmlContext = qmlContext
+        self.qmlContext.setContextProperty('mainController', self)
         self.km = None
-        self.codeList = None
+
+        self._codeList = None
         self._codeMasterList = list()
         self._searchedStockList = list()
         self._currentStock = {'code': '', 'name': ''}
@@ -73,9 +74,9 @@ class MainController(QObject):
         km.put_method(("GetCodeListByMarket", "10"))
         kospi = km.get_method()
         kosdaq = km.get_method()
-        self.codeList = kospi + kosdaq
+        self._codeList = kospi + kosdaq
 
-        for code in self.codeList:
+        for code in self._codeList:
             km.put_method(('GetMasterCodeName', code))
             masterName = km.get_method()
             self._codeMasterList.append({'code': code, 'name': masterName})

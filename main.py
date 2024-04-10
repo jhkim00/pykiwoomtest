@@ -12,6 +12,7 @@ import time
 from functools import partial
 
 import mainController
+import conditionController
 
 logger = logging.getLogger()
 
@@ -47,11 +48,10 @@ if __name__ == "__main__":
     engine = QQmlApplicationEngine()
     engine.warnings.connect(_handleQmlWarnings)
 
-    mainController = mainController.MainController(app)
-    mainController.qmlContext = engine.rootContext()
-    engine.rootContext().setContextProperty('mainController', mainController)
+    mainController = mainController.MainController(engine.rootContext(), app)
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
+    engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
 
     if not engine.rootObjects():
         sys.exit(-1)
@@ -72,5 +72,7 @@ if __name__ == "__main__":
     main_window.closing.connect(partial(_onMainWindowClosed, main_window))
 
     mainController.login()
+
+    conditionController = conditionController.ConditionController(mainController.km, engine.rootContext(), app)
 
     sys.exit(app.exec_())
