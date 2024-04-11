@@ -7,16 +7,20 @@ Rectangle {
     color: "#dd000000"
     clip: true
 
-    property string stockName: ''
-    property string stockCode: ''
+    property string stockName: stockBasicInfoController.currentStock['name']
+    property string stockCode: stockBasicInfoController.currentStock['code']
+
 
     Connections {
-        target: mainController
+        target: stockBasicInfoController
         onCurrentStockChanged: {
-            console.log('onCurrentStockChanged name:' + mainController.currentStock['name'])
-            console.log('onCurrentStockChanged code:' + mainController.currentStock['code'])
-            stockName = mainController.currentStock['name']
-            stockCode = mainController.currentStock['code']
+            console.log('!!!!!!!!!!!onCurrentStockChanged: %1'.arg(stockBasicInfoController.currentStock['name']))
+            console.log('!!!!!!!!!!!onCurrentStockChanged: %1'.arg(stockBasicInfoController.currentStock['code']))
+
+            stockName = stockBasicInfoController.currentStock['name']
+            stockCode = stockBasicInfoController.currentStock['code']
+
+            stockBasicInfoController.getBasicInfo()
         }
     }
 

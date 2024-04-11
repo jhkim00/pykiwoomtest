@@ -2,19 +2,19 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 import pykiwoom
 
+import pkm
+
 logger = logging.getLogger()
 
 
 class ConditionController(QObject):
-    def __init__(self, kiwoomManager: pykiwoom.KiwoomManager, qmlContext, parent=None):
+    def __init__(self, qmlContext, parent=None):
         super().__init__(parent)
         self.qmlContext = qmlContext
         self.qmlContext.setContextProperty('conditionController', self)
-        self.km = kiwoomManager
 
         self._currentCondition = {'code': '', 'name': ''}
         self._conditionList = list()
-        self._getConditionList()
 
     currentConditionChanged = pyqtSignal()
 
@@ -43,9 +43,9 @@ class ConditionController(QObject):
         self._conditionList = conditionList
         self.qmlContext.setContextProperty("conditionList", self._conditionList)
 
-    def _getConditionList(self):
+    def getConditionList(self):
         logger.debug('')
-        km = self.km
+        km = pkm.pkm()
         cmd = {
             'func_name': 'GetConditionNameList'
         }

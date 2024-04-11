@@ -13,6 +13,7 @@ from functools import partial
 
 import mainController
 import conditionController
+import stockBasicInfoController
 
 logger = logging.getLogger()
 
@@ -49,14 +50,16 @@ if __name__ == "__main__":
     engine.warnings.connect(_handleQmlWarnings)
 
     mainController = mainController.MainController(engine.rootContext(), app)
+    stockBasicInfoController = stockBasicInfoController.StockBasicInfoController(engine.rootContext(), app)
+    conditionController = conditionController.ConditionController(engine.rootContext(), app)
+
+    mainController.currentStockChanged.connect(stockBasicInfoController.onCurrentStockChanged)
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
     engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
 
     if not engine.rootObjects():
         sys.exit(-1)
-
-    # engine.rootObjects()[0].raise()
 
     # # QQuickView 생성
     # view = QQuickView()
@@ -73,6 +76,6 @@ if __name__ == "__main__":
 
     mainController.login()
 
-    conditionController = conditionController.ConditionController(mainController.km, engine.rootContext(), app)
+    conditionController.getConditionList()
 
     sys.exit(app.exec_())

@@ -2,6 +2,8 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 import pykiwoom
 
+import pkm
+
 logger = logging.getLogger()
 
 
@@ -10,14 +12,13 @@ class MainController(QObject):
         super().__init__(parent)
         self.qmlContext = qmlContext
         self.qmlContext.setContextProperty('mainController', self)
-        self.km = None
 
         self._codeList = None
         self._codeMasterList = list()
         self._searchedStockList = list()
         self._currentStock = {'code': '', 'name': ''}
 
-    currentStockChanged = pyqtSignal()
+    currentStockChanged = pyqtSignal(dict)
 
     @property
     def codeMasterList(self):
@@ -46,13 +47,13 @@ class MainController(QObject):
 
         logger.debug(f'self._currentStock: {self._currentStock}')
         logger.debug(f"name: {self._currentStock['name']}, code: {self._currentStock['code']}")
-        self.currentStockChanged.emit()
+        self.currentStockChanged.emit(self._currentStock)
 
     @pyqtSlot()
     def login(self):
         logger.debug('login')
-        if self.km is None:
-            self.km = pykiwoom.KiwoomManager()
+
+        pkm.pkm()
 
         self._getCodeList()
 
@@ -69,7 +70,7 @@ class MainController(QObject):
                                                    self.codeMasterList))))
 
     def _getCodeList(self):
-        km = self.km
+        km = pkm.pkm()
         km.put_method(("GetCodeListByMarket", "0"))
         km.put_method(("GetCodeListByMarket", "10"))
         kospi = km.get_method()
