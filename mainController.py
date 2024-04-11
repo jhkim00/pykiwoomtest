@@ -46,7 +46,6 @@ class MainController(QObject):
             self._currentStock = stock.toVariant()
 
         logger.debug(f'self._currentStock: {self._currentStock}')
-        logger.debug(f"name: {self._currentStock['name']}, code: {self._currentStock['code']}")
         self.currentStockChanged.emit(self._currentStock)
 
     @pyqtSlot()

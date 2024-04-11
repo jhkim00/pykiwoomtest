@@ -28,6 +28,7 @@ class StockBasicInfoController(QObject):
         }
 
     currentStockChanged = pyqtSignal(dict)
+    basicInfoChanged = pyqtSignal(dict)
 
     @pyqtProperty(QVariant)
     def currentStock(self):
@@ -42,8 +43,22 @@ class StockBasicInfoController(QObject):
             self._currentStock = stock.toVariant()
 
         logger.debug(f'self._currentStock: {self._currentStock}')
-        logger.debug(f"name: {self._currentStock['name']}, code: {self._currentStock['code']}")
         self.currentStockChanged.emit(self._currentStock)
+
+    @pyqtProperty(QVariant)
+    def basicInfo(self):
+        return self._basicInfo
+
+    @basicInfo.setter
+    def basicInfo(self, info: dict):
+        logger.debug(f'info: {info}')
+        if isinstance(info, dict):
+            self._basicInfo = info
+        else:
+            self._basicInfo = info.toVariant()
+
+        logger.debug(f'self._basicInfo: {self._basicInfo}')
+        self.basicInfoChanged.emit(self._basicInfo)
 
     @pyqtSlot(dict)
     def onCurrentStockChanged(self, stock: dict):
@@ -68,8 +83,7 @@ class StockBasicInfoController(QObject):
         data, remain = km.get_tr()
         print(data)
 
-        data_dict = data.iloc[0].to_dict()
-        print(data_dict)
+        self.basicInfo = data.iloc[0].to_dict()
 
 
 
