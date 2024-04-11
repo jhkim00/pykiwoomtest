@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15
 Item {
     id: root
     width: 80
-    height: 50
+    height: 40
 
     property string keyText
     property string valueText

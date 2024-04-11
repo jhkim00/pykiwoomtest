@@ -47,17 +47,18 @@ Rectangle {
 
     Item {
         id: stockNameAndCode
-        width: 100
+        anchors.verticalCenter: parent.verticalCenter
+        width: 150
         height: 50
 
         Item {
             x: 10
             width: parent.width - x
-            height: 18
+            height: 20
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: stockName
-                font.pixelSize: 16
+                font.pixelSize: 20
                 font.bold: true
                 color: 'green'
             }
@@ -79,7 +80,9 @@ Rectangle {
 
     Row {
         id: basicInfo
-        height: 50
+        height: parent.height * 0.5
+        anchors.top: parent.top
+        anchors.topMargin: 10
         anchors.left: stockNameAndCode.right
 
         VerticalKeyValueLabel {
