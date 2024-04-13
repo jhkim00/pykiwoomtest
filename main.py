@@ -13,7 +13,7 @@ from functools import partial
 
 import mainController
 import conditionController
-import stockBasicInfoController
+import stockInfoController
 
 logger = logging.getLogger()
 
@@ -50,13 +50,13 @@ if __name__ == "__main__":
     engine.warnings.connect(_handleQmlWarnings)
 
     mainController = mainController.MainController(engine.rootContext(), app)
-    stockBasicInfoController = stockBasicInfoController.StockBasicInfoController(engine.rootContext(), app)
-    conditionController = conditionController.ConditionController(engine.rootContext(), app)
+    stockInfoController = stockInfoController.StockBasicInfoController(engine.rootContext(), app)
+    # conditionController = conditionController.ConditionController(engine.rootContext(), app)
 
-    mainController.currentStockChanged.connect(stockBasicInfoController.onCurrentStockChanged)
+    mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
-    engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
+    # engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
 
     if not engine.rootObjects():
         sys.exit(-1)
@@ -66,6 +66,6 @@ if __name__ == "__main__":
 
     mainController.login()
 
-    conditionController.getConditionList()
+    # conditionController.getConditionList()
 
     sys.exit(app.exec_())

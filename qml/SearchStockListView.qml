@@ -45,6 +45,7 @@ Rectangle {
     }
 
     StockListView {
+        id: listViewStock
         anchors.top: textFieldInput.bottom
         width: parent.width
         height: parent.height - textFieldInput.height
