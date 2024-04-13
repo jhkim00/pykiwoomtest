@@ -24,7 +24,7 @@ def _handleQmlWarnings(warnings):
 
 
 def _onMainWindowClosed(sender, close_):
-    logger.debug('onMainWindowClosed')
+    logger.debug('')
     for rootObj in engine.rootObjects():
         if rootObj != sender:
             print('onMainWindowClosed 1')
@@ -60,16 +60,6 @@ if __name__ == "__main__":
 
     if not engine.rootObjects():
         sys.exit(-1)
-
-    # # QQuickView 생성
-    # view = QQuickView()
-    # view.setSource(QUrl.fromLocalFile("Sub.qml"))
-    #
-    # # QQmlApplicationEngine에서 rootContext를 설정
-    # view.rootContext().setContextProperty("engine", engine)
-    #
-    # # QQuickView 표시
-    # view.show()
 
     main_window = engine.rootObjects()[0]
     main_window.closing.connect(partial(_onMainWindowClosed, main_window))

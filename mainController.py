@@ -1,6 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
-import pykiwoom
 
 import pkm
 
@@ -50,7 +49,7 @@ class MainController(QObject):
 
     @pyqtSlot()
     def login(self):
-        logger.debug('login')
+        logger.debug('')
 
         pkm.pkm()
 

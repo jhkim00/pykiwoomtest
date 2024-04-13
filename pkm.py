@@ -1,4 +1,4 @@
-import pykiwoom
+import kiwoom
 
 _pkm = None
 
@@ -6,5 +6,5 @@ _pkm = None
 def pkm():
     global _pkm
     if _pkm is None:
-        _pkm = pykiwoom.KiwoomManager()
+        _pkm = kiwoom.KiwoomManager()
     return _pkm

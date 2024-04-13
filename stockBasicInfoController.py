@@ -1,6 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
-import pykiwoom
 
 import pkm
 
@@ -67,7 +66,7 @@ class StockBasicInfoController(QObject):
 
     @pyqtSlot()
     def getBasicInfo(self):
-        logger.debug('getBasicInfo')
+        logger.debug('')
         tr_cmd = {
             'rqname': "주식기본정보",
             'trcode': 'opt10001',
@@ -84,6 +83,8 @@ class StockBasicInfoController(QObject):
         print(data)
 
         self.basicInfo = data.iloc[0].to_dict()
+
+
 
 
 
