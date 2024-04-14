@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import "./component"
 
 Rectangle {
     id: root
@@ -31,6 +32,21 @@ Rectangle {
                 border.width: 2
             }
         }
+        Keys.onUpPressed: {
+            console.log("onUpPressed")
+            if (listViewStock.currentIndex > 0) {
+                --listViewStock.currentIndex
+            }
+            console.log(listViewStock.currentIndex)
+        }
+
+        Keys.onDownPressed: {
+            console.log("onDownPressed");
+            if (listViewStock.currentIndex < listViewStock.model.length - 1) {
+                ++listViewStock.currentIndex
+            }
+            console.log(listViewStock.currentIndex)
+        }
         Keys.onReturnPressed: {
             console.log("onReturnPressed")
             var stock = listViewStock.getCurrentStock()
@@ -41,6 +57,22 @@ Rectangle {
         onDisplayTextChanged: {
             console.log('onDisplayTextChanged ' + displayText)
             mainController.onInputTextChanged(displayText)
+        }
+
+        TextButton {
+            width: 30
+            height: 30
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: 10
+            text: "X"
+            textSize: 20
+            normalColor: 'grey'
+            radius: 10
+            onBtnClicked: {
+                console.log('x button clicked.')
+                textFieldInput.text = ''
+            }
         }
     }
 
