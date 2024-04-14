@@ -14,6 +14,7 @@ from functools import partial
 import mainController
 import conditionController
 import stockInfoController
+import candleChartController
 
 logger = logging.getLogger()
 
@@ -52,8 +53,10 @@ if __name__ == "__main__":
     mainController = mainController.MainController(engine.rootContext(), app)
     stockInfoController = stockInfoController.StockBasicInfoController(engine.rootContext(), app)
     # conditionController = conditionController.ConditionController(engine.rootContext(), app)
+    candleChartController = candleChartController.CandleChartController(engine.rootContext(), app)
 
     mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
+    mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
     # engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
@@ -67,5 +70,6 @@ if __name__ == "__main__":
     mainController.login()
 
     # conditionController.getConditionList()
+    candleChartController.getDailyChart()
 
     sys.exit(app.exec_())
