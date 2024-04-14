@@ -69,6 +69,15 @@ Rectangle {
         return 'white'
     }
 
+    function getDiffSignSymbol() {
+        switch (diffSign) {
+        case '1': return "\u2b61"
+        case '2': return "\u25b2"
+        case '5': return "\u25bc"
+        default: return ""
+        }
+    }
+
     Connections {
         target: stockInfoController
         onCurrentStockChanged: {
@@ -221,11 +230,13 @@ Rectangle {
         }
         VerticalKeyValueLabel {
             keyText: '대비기호'
-            valueText: diffSign
+            valueText: getDiffSignSymbol()
+            valueColor: getPriceColor(currentPrice, refPrice)
         }
         VerticalKeyValueLabel {
             keyText: '전일대비'
             valueText: numberStrToFormated(diffPrice)
+            valueColor: getPriceColor(currentPrice, refPrice)
         }
         VerticalKeyValueLabel {
             keyText: '등락률'
