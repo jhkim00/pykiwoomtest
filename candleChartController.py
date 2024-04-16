@@ -57,4 +57,10 @@ class CandleChartController(QObject):
         km.put_tr(tr_cmd)
         data, remain = km.get_tr()
         print(data)
-        webSocketServer.WebSocketServer.getInstance().putData(data)
+        columns_to_keep = ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가']
+        data_ = data[columns_to_keep]
+        new_column_names = {'종목코드': 'code', '현재가': 'close', '거래량': 'volume', '거래대금': 'transaction_amount',
+                            '일자': 'date', '시가': 'open', '고가': 'high', '저가': 'low'}
+        data_ = data_.rename(columns=new_column_names)
+        print(data_)
+        webSocketServer.WebSocketServer.getInstance().putData(data_)

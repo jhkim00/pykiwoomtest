@@ -39,9 +39,10 @@ class WebSocketServer(QObject):
                 logger.debug('!!!!!!!!!!!!')
                 data = self._queue.get()
                 logger.debug(data)
-                jsonData = data.to_json()
+                jsonData = data.to_json(orient='records')
                 logger.debug(jsonData)
                 await websocket.send(jsonData)
+                logger.debug('@@@@@@@@@@@@')
 
         start_server = websockets.serve(handler, "localhost", 8000)
 
