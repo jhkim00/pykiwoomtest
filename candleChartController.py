@@ -2,6 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 
 import pkm
+import webSocketServer
 
 logger = logging.getLogger()
 
@@ -36,6 +37,8 @@ class CandleChartController(QObject):
         logger.debug(f'stock: {stock}')
         self.currentStock = stock
 
+        self.getDailyChart()
+
     @pyqtSlot()
     def getDailyChart(self):
         logger.debug('')
@@ -54,3 +57,4 @@ class CandleChartController(QObject):
         km.put_tr(tr_cmd)
         data, remain = km.get_tr()
         print(data)
+        webSocketServer.WebSocketServer.getInstance().putData(data)

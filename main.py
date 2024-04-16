@@ -16,6 +16,7 @@ import conditionController
 import stockInfoController
 import candleChartController
 import realDataWorker
+import webSocketServer
 
 logger = logging.getLogger()
 
@@ -71,8 +72,15 @@ if __name__ == "__main__":
     mainController.login()
 
     # conditionController.getConditionList()
-    candleChartController.getDailyChart()
+    # candleChartController.getDailyChart()
 
     realDataWorker.RealDataWorker.getInstance().start()
+
+    webSocketServerThread = webSocketServer.WebSocketServerThread()
+    webSocketServer = webSocketServer.WebSocketServer.getInstance()
+
+    webSocketServer.moveToThread(webSocketServerThread)
+    webSocketServerThread.started.connect(webSocketServer.run)
+    webSocketServerThread.start()
 
     sys.exit(app.exec_())

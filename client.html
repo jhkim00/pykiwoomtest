@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Example</title>
+</head>
+<body>
+<div id="messages"></div>
+
+<script>
+// 웹소켓 서버에 연결
+const socket = new WebSocket('ws://localhost:8000');
+
+// 연결이 성공하면 메시지 출력
+socket.addEventListener('open', function (event) {
+    console.log('Connected to WebSocket server');
+});
+
+// 메시지를 받으면 화면에 출력
+socket.addEventListener('message', function (event) {
+    const messagesDiv = document.getElementById('messages');
+    messagesDiv.innerHTML += '<p>' + event.data + '</p>';
+});
+</script>
+</body>
+</html>
