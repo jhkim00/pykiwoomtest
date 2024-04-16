@@ -15,6 +15,7 @@ import mainController
 import conditionController
 import stockInfoController
 import candleChartController
+import realDataWorker
 
 logger = logging.getLogger()
 
@@ -71,5 +72,7 @@ if __name__ == "__main__":
 
     # conditionController.getConditionList()
     candleChartController.getDailyChart()
+
+    realDataWorker.RealDataWorker.getInstance().start()
 
     sys.exit(app.exec_())

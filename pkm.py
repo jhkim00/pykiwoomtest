@@ -1,5 +1,9 @@
+import sys
+import logging
+from PyQt5.QtCore import QThread, pyqtSignal, QObject
 import kiwoom
 
+logger = logging.getLogger()
 _pkm = None
 
 

@@ -215,11 +215,14 @@ class Kiwoom:
             data (str): 실시간 데이터 전문
         """
         # get real data
-        real_data = {"code": code}
+        real_data = {"code": code, "rtype": rtype}
+        # logger.debug(self.real_fid)
         if code in self.real_fid:
             for fid in self.real_fid[code]:
+                # logger.debug(f'fid:{fid}')
                 val = self.GetCommRealData(code, fid)
                 real_data[fid] = val
+                # logger.debug(f'val:{val}')
 
             # put real data to the queue
             self.real_dqueues.put(real_data)

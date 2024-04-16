@@ -2,6 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 
 import pkm
+import realDataWorker
 
 logger = logging.getLogger()
 
@@ -38,6 +39,8 @@ class StockBasicInfoController(QObject):
             '거래량': '',
             '거래대비': ''
         }
+
+        realDataWorker.RealDataWorker.getInstance().data_received.connect(self._onRealData)
 
     currentStockChanged = pyqtSignal(dict)
     basicInfoChanged = pyqtSignal(dict)
@@ -114,10 +117,41 @@ class StockBasicInfoController(QObject):
         self.basicInfo = data.iloc[0, :len(self.basicInfo)].to_dict()
         self.priceInfo = data.iloc[0, len(self.basicInfo):].to_dict()
 
+        real_cmd = {
+            'func_name': "SetRealReg",
+            'real_type': '주식체결',
+            'screen': '1000',
+            'code_list': [self._currentStock['code']],
+            'fid_list': ['20', '10', '11', '12', '13', '16', '17', '18', '25', '30'],
+            "opt_type": 0
+        }
+        km.put_real(real_cmd)
 
+    @pyqtSlot(dict)
+    def _onRealData(self, data: dict):
+        # logger.debug(data)
+        if data['code'] == self._currentStock['code']:
+            if data['rtype'] == '주식체결':
+                _priceInfo = {
+                    '시가': '',
+                    '고가': '',
+                    '저가': '',
+                    '현재가': '',
+                    '기준가': self._priceInfo['기준가'],
+                    '대비기호': '',
+                    '전일대비': '',
+                    '등락율': '',
+                    '거래량': '',
+                    '거래대비': ''
+                }
+                _priceInfo['현재가'] = data['10']
+                _priceInfo['전일대비'] = data['11']
+                _priceInfo['등락율'] = data['12']
+                _priceInfo['거래량'] = data['13']
+                _priceInfo['시가'] = data['16']
+                _priceInfo['고가'] = data['17']
+                _priceInfo['저가'] = data['18']
+                _priceInfo['대비기호'] = data['25']
+                _priceInfo['거래대비'] = data['30']
 
-
-
-
-
-
+                self.priceInfo = _priceInfo
