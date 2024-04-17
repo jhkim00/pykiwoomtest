@@ -31,11 +31,9 @@ Rectangle {
     property string diffRate: ''
     property string volume: ''
     property string volumeRate: ''
+    property string priceColor: 'white'
 
-    function numberStrToFormated(numberStr) {
-        // 숫자 문자열에서 '+' 또는 '-' 기호 제거
-        numberStr = numberStr.replace(/^[-+]/, '');
-
+    function numberStrToNonAbsFormated(numberStr) {
         var result = '';
         var strLength = numberStr.length;
         var commaIndex = strLength % 3;
@@ -55,6 +53,13 @@ Rectangle {
         }
 
         return result;
+    }
+
+    function numberStrToFormated(numberStr) {
+        // 숫자 문자열에서 '+' 또는 '-' 기호 제거
+        numberStr = numberStr.replace(/^[-+]/, '');
+
+        return numberStrToNonAbsFormated(numberStr)
     }
 
     function getPriceColor(price, refPrice) {
@@ -115,6 +120,8 @@ Rectangle {
             diffRate = stockInfoController.priceInfo['등락율']
             volume = stockInfoController.priceInfo['거래량']
             volumeRate = stockInfoController.priceInfo['거래대비']
+
+            priceColor = getPriceColor(currentPrice, refPrice)
         }
     }
 
@@ -222,7 +229,7 @@ Rectangle {
         VerticalKeyValueLabel {
             keyText: '현재가'
             valueText: numberStrToFormated(currentPrice)
-            valueColor: getPriceColor(currentPrice, refPrice)
+            valueColor: priceColor
         }
         VerticalKeyValueLabel {
             keyText: '기준가'
@@ -231,16 +238,17 @@ Rectangle {
         VerticalKeyValueLabel {
             keyText: '대비기호'
             valueText: getDiffSignSymbol()
-            valueColor: getPriceColor(currentPrice, refPrice)
+            valueColor: priceColor
         }
         VerticalKeyValueLabel {
             keyText: '전일대비'
             valueText: numberStrToFormated(diffPrice)
-            valueColor: getPriceColor(currentPrice, refPrice)
+            valueColor: priceColor
         }
         VerticalKeyValueLabel {
             keyText: '등락률'
-            valueText: numberStrToFormated(diffRate) + ' %'
+            valueText: numberStrToNonAbsFormated(diffRate) + ' %'
+            valueColor: priceColor
         }
         VerticalKeyValueLabel {
             keyText: '거래량'
@@ -249,6 +257,7 @@ Rectangle {
         VerticalKeyValueLabel {
             keyText: '거래대비'
             valueText: numberStrToFormated(volumeRate) + ' %'
+            valueColor: getPriceColor(volumeRate, 100)
         }
     }
 }
