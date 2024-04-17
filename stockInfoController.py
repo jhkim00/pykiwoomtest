@@ -123,7 +123,7 @@ class StockBasicInfoController(QObject):
             'screen': '1000',
             'code_list': [self._currentStock['code']],
             'fid_list': ['20', '10', '11', '12', '13', '16', '17', '18', '25', '30'],
-            "opt_type": 0
+            "opt_type": 1
         }
         km.put_real(real_cmd)
 
