@@ -15,8 +15,22 @@ ApplicationWindow {
     }
 
     SearchStockListView {
+        id: searchStockListView
         anchors.top: stockInfo.bottom
         width: 240
         height: parent.height - stockInfo.height
+    }
+
+    StockListView {
+        anchors.top: stockInfo.bottom
+        anchors.left: searchStockListView.right
+        width: parent.width - searchStockListView.width
+        height: searchStockListView.height
+        model: favoriteList
+
+        onItemClicked: {
+            console.log('onItemClicked ' + itemData['name'] + ', '+ itemData['code'])
+            mainController.currentStock = itemData
+        }
     }
 }

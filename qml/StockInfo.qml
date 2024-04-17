@@ -32,6 +32,11 @@ Rectangle {
     property string volume: ''
     property string volumeRate: ''
     property string priceColor: 'white'
+    property bool isFavorite: false
+
+    function updateFavorite() {
+        isFavorite = favoriteStockController.isFavoriteStock(stockCode)
+    }
 
     function numberStrToNonAbsFormated(numberStr) {
         var result = '';
@@ -122,6 +127,16 @@ Rectangle {
             volumeRate = stockInfoController.priceInfo['거래대비']
 
             priceColor = getPriceColor(currentPrice, refPrice)
+
+            updateFavorite()
+        }
+    }
+
+    Connections {
+        target: favoriteStockController
+        onFavoriteStockChanged: {
+            console.log('onFavoriteStockChanged')
+            updateFavorite()
         }
     }
 
@@ -155,6 +170,24 @@ Rectangle {
                 font.pixelSize: 12
                 font.bold: false
                 color: 'white'
+            }
+        }
+        TextButton {
+            id: favoriteBtn
+            width: 30
+            height: 30
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.rightMargin: 10
+            anchors.bottomMargin: 10
+            text:  isFavorite ? '-' : '+'
+            textSize: 20
+            normalColor: 'grey'
+            radius: 10
+            onBtnClicked: {
+                console.log('%1 button clicked.'.arg(text))
+                isFavorite ? favoriteStockController.delete(stockCode)
+                           : favoriteStockController.add(stockName, stockCode)
             }
         }
     }

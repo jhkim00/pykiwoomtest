@@ -18,3 +18,5 @@ __pycache__/
 
 # Visual Studio Code project files
 *.vscode/
+
+*.db

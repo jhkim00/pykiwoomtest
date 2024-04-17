@@ -15,6 +15,7 @@ import mainController
 import conditionController
 import stockInfoController
 import candleChartController
+import favoriteStockController
 import realDataWorker
 import webSocketServer
 
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     stockInfoController = stockInfoController.StockBasicInfoController(engine.rootContext(), app)
     # conditionController = conditionController.ConditionController(engine.rootContext(), app)
     candleChartController = candleChartController.CandleChartController(engine.rootContext(), app)
+    favoriteStockController = favoriteStockController.FavoriteStockController(engine.rootContext(), app)
 
     mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
     mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
@@ -76,11 +78,11 @@ if __name__ == "__main__":
 
     realDataWorker.RealDataWorker.getInstance().start()
 
-    webSocketServerThread = webSocketServer.WebSocketServerThread()
-    webSocketServer = webSocketServer.WebSocketServer.getInstance()
-
-    webSocketServer.moveToThread(webSocketServerThread)
-    webSocketServerThread.started.connect(webSocketServer.run)
-    webSocketServerThread.start()
+    # webSocketServerThread = webSocketServer.WebSocketServerThread()
+    # webSocketServer = webSocketServer.WebSocketServer.getInstance()
+    #
+    # webSocketServer.moveToThread(webSocketServerThread)
+    # webSocketServerThread.started.connect(webSocketServer.run)
+    # webSocketServerThread.start()
 
     sys.exit(app.exec_())
