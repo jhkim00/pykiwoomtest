@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
+import time
 import dbHelper
 
 import pkm
@@ -21,6 +22,7 @@ class FavoriteStockController(QObject):
         realDataWorker.RealDataWorker.getInstance().data_received.connect(self._onRealData)
 
     favoriteStockChanged = pyqtSignal()
+    favoriteStockPriceChanged = pyqtSignal(str, dict)
 
     def loadFavoriteStock(self):
         rows = dbHelper.DbHelper.getInstance().selectTableFavorite()
@@ -30,17 +32,44 @@ class FavoriteStockController(QObject):
             stockList.append({'name': item[0], 'code': item[1]})
 
         logger.debug(stockList)
+
+        for stock in stockList:
+            if self._getStockPriceInfo(stock):
+                time.sleep(0.2)
+
         self.favoriteList = stockList
+
+        self._getRealData()
 
     @pyqtSlot(str, str)
     def add(self, name: str, code: str):
+        for stock in self._favoriteList:
+            if stock['code'] == code:
+                return
+
         dbHelper.DbHelper.getInstance().insertStockToTableFavorite(name, code)
-        self.loadFavoriteStock()
+        stock = {'name': name, 'code': code}
+        self._getStockPriceInfo(stock)
+        self._favoriteList.append(stock)
+        self.qmlContext.setContextProperty("favoriteList", self._favoriteList)
+        self.favoriteStockChanged.emit()
 
     @pyqtSlot(str)
     def delete(self, code: str):
-        dbHelper.DbHelper.getInstance().deleteStockFromTableFavorite(code)
-        self.loadFavoriteStock()
+        stockToRemove = None
+        for stock in self._favoriteList:
+            if stock['code'] == code:
+                dbHelper.DbHelper.getInstance().deleteStockFromTableFavorite(code)
+                stockToRemove = stock
+                break
+
+        km = pkm.pkm()
+        km.put_method(('SetRealRemove', '1001', code))
+        result = km.get_method()
+        logger.debug(f'SetRealRemove result:{result}')
+        self._favoriteList.remove(stockToRemove)
+        self.qmlContext.setContextProperty("favoriteList", self._favoriteList)
+        self.favoriteStockChanged.emit()
 
     @pyqtSlot(str, result=bool)
     def isFavoriteStock(self, code):
@@ -55,18 +84,42 @@ class FavoriteStockController(QObject):
 
     @favoriteList.setter
     def favoriteList(self, favoriteList: list):
+        logger.debug('')
         self._favoriteList = favoriteList
         self.qmlContext.setContextProperty("favoriteList", self._favoriteList)
 
         self.favoriteStockChanged.emit()
 
-        self._getRealData()
+    @staticmethod
+    def _getStockPriceInfo(stock):
+        logger.debug('')
+        if 'priceInfo' not in stock:
+            logger.debug(f"priceInfo not in stock code: {stock['code']}")
+            tr_cmd = {
+                'rqname': "주식기본정보",
+                'trcode': 'opt10001',
+                'next': '0',
+                'screen': '1001',
+                'input': {
+                    "종목코드": stock['code']
+                },
+                'output': ['시가', '고가', '저가', '현재가', '기준가', '대비기호', '전일대비', '등락율', '거래량', '거래대비']
+            }
+            km = pkm.pkm()
+            km.put_tr(tr_cmd)
+            data, remain = km.get_tr()
+
+            stock['priceInfo'] = data.iloc[0].to_dict()
+            return True
+
+        return False
 
     def _getRealData(self):
+        logger.debug('')
         real_cmd = {
             'func_name': "SetRealReg",
             'real_type': '주식체결',
-            'screen': '1000',
+            'screen': '1001',
             'code_list': [item['code'] for item in self._favoriteList],
             'fid_list': ['20', '10', '11', '12', '13', '16', '17', '18', '25', '30'],
             "opt_type": 1
@@ -77,32 +130,37 @@ class FavoriteStockController(QObject):
     @pyqtSlot(dict)
     def _onRealData(self, data: dict):
         # logger.debug(data)
-        code_list = [item['code'] for item in self._favoriteList]
-        if data['code'] in code_list:
-            if data['rtype'] == '주식체결':
-                _priceInfo = {
-                    '시가': '',
-                    '고가': '',
-                    '저가': '',
-                    '현재가': '',
-                    '기준가': '',
-                    '대비기호': '',
-                    '전일대비': '',
-                    '등락율': '',
-                    '거래량': '',
-                    '거래대비': ''
-                }
-                _priceInfo['현재가'] = data['10']
-                _priceInfo['전일대비'] = data['11']
-                _priceInfo['등락율'] = data['12']
-                _priceInfo['거래량'] = data['13']
-                _priceInfo['시가'] = data['16']
-                _priceInfo['고가'] = data['17']
-                _priceInfo['저가'] = data['18']
-                _priceInfo['대비기호'] = data['25']
-                _priceInfo['거래대비'] = data['30']
+        for stock in self._favoriteList:
+            if data['code'] == stock['code']:
+                if data['rtype'] == '주식체결':
+                    _priceInfo = {
+                        '시가': '',
+                        '고가': '',
+                        '저가': '',
+                        '현재가': '',
+                        '기준가': '',
+                        '대비기호': '',
+                        '전일대비': '',
+                        '등락율': '',
+                        '거래량': '',
+                        '거래대비': ''
+                    }
+                    _priceInfo['현재가'] = data['10']
+                    _priceInfo['전일대비'] = data['11']
+                    _priceInfo['등락율'] = data['12']
+                    _priceInfo['거래량'] = data['13']
+                    _priceInfo['시가'] = data['16']
+                    _priceInfo['고가'] = data['17']
+                    _priceInfo['저가'] = data['18']
+                    _priceInfo['대비기호'] = data['25']
+                    _priceInfo['거래대비'] = data['30']
+                    _priceInfo['기준가'] = stock['priceInfo']['기준가']
 
-                logger.debug(f"code: {data['code']}")
-                logger.debug(_priceInfo)
+                    logger.debug(f"code: {data['code']}")
+                    logger.debug(_priceInfo)
+
+                    stock['priceInfo'] = _priceInfo
+
+                    self.favoriteStockPriceChanged.emit(stock['code'], _priceInfo)
 
 

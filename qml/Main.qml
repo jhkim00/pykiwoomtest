@@ -21,7 +21,7 @@ ApplicationWindow {
         height: parent.height - stockInfo.height
     }
 
-    StockListView {
+    StockPriceListView {
         anchors.top: stockInfo.bottom
         anchors.left: searchStockListView.right
         width: parent.width - searchStockListView.width

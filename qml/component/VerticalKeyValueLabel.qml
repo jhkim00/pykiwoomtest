@@ -8,6 +8,7 @@ Item {
 
     property string keyText
     property string valueText
+    property var keyColor: 'white'
     property var valueColor: 'white'
 
     Item {
@@ -18,7 +19,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             text: keyText
             font.pixelSize: 12
-            color: 'white'
+            color: keyColor
         }
     }
     Item {

@@ -56,11 +56,11 @@ if __name__ == "__main__":
     mainController = mainController.MainController(engine.rootContext(), app)
     stockInfoController = stockInfoController.StockBasicInfoController(engine.rootContext(), app)
     # conditionController = conditionController.ConditionController(engine.rootContext(), app)
-    candleChartController = candleChartController.CandleChartController(engine.rootContext(), app)
+    # candleChartController = candleChartController.CandleChartController(engine.rootContext(), app)
     favoriteStockController = favoriteStockController.FavoriteStockController(engine.rootContext(), app)
 
     mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
-    mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
+    # mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
     # engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))

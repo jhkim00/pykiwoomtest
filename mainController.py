@@ -17,6 +17,8 @@ class MainController(QObject):
         self._searchedStockList = list()
         self._currentStock = {'code': '', 'name': ''}
 
+        self.qmlContext.setContextProperty("searchedStockList", self._searchedStockList)
+
     currentStockChanged = pyqtSignal(dict)
 
     @property
