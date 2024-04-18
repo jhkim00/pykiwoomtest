@@ -42,9 +42,9 @@ class StockBasicInfoController(QObject):
 
         realDataWorker.RealDataWorker.getInstance().data_received.connect(self._onRealData)
 
-    currentStockChanged = pyqtSignal(dict)
-    basicInfoChanged = pyqtSignal(dict)
-    priceInfoChanged = pyqtSignal(dict)
+    currentStockChanged = pyqtSignal()
+    basicInfoChanged = pyqtSignal()
+    priceInfoChanged = pyqtSignal()
 
     @pyqtProperty(QVariant)
     def currentStock(self):
@@ -59,7 +59,7 @@ class StockBasicInfoController(QObject):
             self._currentStock = stock.toVariant()
 
         logger.debug(f'self._currentStock: {self._currentStock}')
-        self.currentStockChanged.emit(self._currentStock)
+        self.currentStockChanged.emit()
 
     @pyqtProperty(QVariant)
     def basicInfo(self):
@@ -74,7 +74,7 @@ class StockBasicInfoController(QObject):
             self._basicInfo = info.toVariant()
 
         logger.debug(f'self._basicInfo: {self._basicInfo}')
-        self.basicInfoChanged.emit(self._basicInfo)
+        self.basicInfoChanged.emit()
 
     @pyqtProperty(QVariant)
     def priceInfo(self):
@@ -89,7 +89,7 @@ class StockBasicInfoController(QObject):
             self._priceInfo = price.toVariant()
 
         logger.debug(f'self._priceInfo: {self._priceInfo}')
-        self.priceInfoChanged.emit(self._priceInfo)
+        self.priceInfoChanged.emit()
 
     @pyqtSlot(dict)
     def onCurrentStockChanged(self, stock: dict):

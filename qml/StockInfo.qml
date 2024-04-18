@@ -90,7 +90,7 @@ Rectangle {
 
     Connections {
         target: stockInfoController
-        onCurrentStockChanged: {
+        function onCurrentStockChanged() {
             console.log('!!!!!!!!!!!onCurrentStockChanged: %1'.arg(stockInfoController.currentStock['name']))
             console.log('!!!!!!!!!!!onCurrentStockChanged: %1'.arg(stockInfoController.currentStock['code']))
 
@@ -99,7 +99,7 @@ Rectangle {
 
             stockInfoController.getBasicInfo()
         }
-        onBasicInfoChanged: {
+        function onBasicInfoChanged() {
             console.log('onBasicInfoChanged')
 
             sichong = stockInfoController.basicInfo['시가총액']
@@ -112,7 +112,7 @@ Rectangle {
             yootongRate = stockInfoController.basicInfo['유통비율']
             sinyongRate = stockInfoController.basicInfo['신용비율']
         }
-        onPriceInfoChanged: {
+        function onPriceInfoChanged() {
             console.log('onPriceInfoChanged')
 
             startPrice = stockInfoController.priceInfo['시가']
@@ -134,7 +134,7 @@ Rectangle {
 
     Connections {
         target: favoriteStockController
-        onFavoriteStockChanged: {
+        function onFavoriteStockChanged() {
             console.log('onFavoriteStockChanged')
             updateFavorite()
         }

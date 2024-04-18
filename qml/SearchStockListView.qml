@@ -65,7 +65,7 @@ Rectangle {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.rightMargin: 10
-            text: "X"
+            text: "x"
             textSize: 20
             normalColor: 'grey'
             radius: 10

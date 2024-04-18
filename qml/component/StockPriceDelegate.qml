@@ -59,34 +59,29 @@ Rectangle {
             priceRow.updatePriceInfo()
         }
 
-        Connections {
-            target: favoriteStockController
-            function onFavoriteStockPriceChanged(code, price) {
-                console.log('onFavoriteStockPriceChanged code:%1 currentPrice:%2'.arg(code).arg(price['시가']))
-                if (code === modelData['code']) {
-//                    priceRow.priceInfo = price
-                    priceRow.updatePriceInfo()
-                }
-            }
-        }
-
         function updatePriceInfo() {
             console.log('updatePriceInfo')
             if (priceInfo !== undefined) {
                 console.log('priceInfo !== undefined')
-                startPrice = priceInfo['시가']
-                highPrice = priceInfo['고가']
-                lowPrice = priceInfo['저가']
-                currentPrice = priceInfo['현재가']
-                refPrice = priceInfo['기준가']
-                diffSign = priceInfo['대비기호']
-                diffPrice = priceInfo['전일대비']
-                diffRate = priceInfo['등락율']
-                volume = priceInfo['거래량']
-                volumeRate = priceInfo['거래대비']
-
-                priceColor = getPriceColor(currentPrice, refPrice)
+                onPriceInfoInfoChanged(priceInfo.info)
+                priceInfo.infoChanged.connect(onPriceInfoInfoChanged)
             }
+        }
+
+        function onPriceInfoInfoChanged(info) {
+            console.log('onInfoChanged')
+            startPrice = info['시가']
+            highPrice = info['고가']
+            lowPrice = info['저가']
+            currentPrice = info['현재가']
+            refPrice = info['기준가']
+            diffSign = info['대비기호']
+            diffPrice = info['전일대비']
+            diffRate = info['등락율']
+            volume = info['거래량']
+            volumeRate = info['거래대비']
+
+            priceColor = getPriceColor(currentPrice, refPrice)
         }
 
         function numberStrToNonAbsFormated(numberStr) {

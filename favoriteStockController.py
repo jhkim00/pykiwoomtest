@@ -5,6 +5,7 @@ import dbHelper
 
 import pkm
 import realDataWorker
+import priceInfo
 
 logger = logging.getLogger()
 
@@ -22,7 +23,6 @@ class FavoriteStockController(QObject):
         realDataWorker.RealDataWorker.getInstance().data_received.connect(self._onRealData)
 
     favoriteStockChanged = pyqtSignal()
-    favoriteStockPriceChanged = pyqtSignal(str, dict)
 
     def loadFavoriteStock(self):
         rows = dbHelper.DbHelper.getInstance().selectTableFavorite()
@@ -109,7 +109,10 @@ class FavoriteStockController(QObject):
             km.put_tr(tr_cmd)
             data, remain = km.get_tr()
 
-            stock['priceInfo'] = data.iloc[0].to_dict()
+            _priceInfo = priceInfo.PriceInfo()
+            _priceInfo.info = data.iloc[0].to_dict()
+
+            stock['priceInfo'] = _priceInfo
             return True
 
         return False
@@ -159,8 +162,4 @@ class FavoriteStockController(QObject):
                     logger.debug(f"code: {data['code']}")
                     logger.debug(_priceInfo)
 
-                    stock['priceInfo'] = _priceInfo
-
-                    self.favoriteStockPriceChanged.emit(stock['code'], _priceInfo)
-
-
+                    stock['priceInfo'].info = _priceInfo
