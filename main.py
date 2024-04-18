@@ -77,6 +77,7 @@ if __name__ == "__main__":
     # candleChartController.getDailyChart()
 
     realDataWorker.RealDataWorker.getInstance().start()
+    main_window.closing.connect(realDataWorker.RealDataWorker.getInstance().putFinishMsg)
 
     # webSocketServerThread = webSocketServer.WebSocketServerThread()
     # webSocketServer = webSocketServer.WebSocketServer.getInstance()

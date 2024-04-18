@@ -220,7 +220,7 @@ Rectangle {
     states: [
         State {
             name: "normal"
-            when: !listViewItemMouseArea.containsPress && listView.currentIndex != index
+            when: !listViewItemMouseArea.containsPress
             PropertyChanges { target: root; color: "white" }
             PropertyChanges { target: listViewItemTextName; color: "black" }
             PropertyChanges { target: listViewItemTextCode; color: "black" }
@@ -229,13 +229,6 @@ Rectangle {
             name: "pressed"
             when: listViewItemMouseArea.containsPress
             PropertyChanges { target: root; color: "lightskyblue" }
-            PropertyChanges { target: listViewItemTextName; color: "white" }
-            PropertyChanges { target: listViewItemTextCode; color: "white" }
-        },
-        State {
-            name: "focused"
-            when: listView.currentIndex == index
-            PropertyChanges { target: root; color: "lightsteelblue" }
             PropertyChanges { target: listViewItemTextName; color: "white" }
             PropertyChanges { target: listViewItemTextCode; color: "white" }
         }
