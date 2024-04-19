@@ -17,7 +17,8 @@ import stockInfoController
 import candleChartController
 import favoriteStockController
 import realDataWorker
-import webSocketServer
+import candleSocketServer
+import candleSocketServerTest
 
 logger = logging.getLogger()
 
@@ -56,11 +57,11 @@ if __name__ == "__main__":
     mainController = mainController.MainController(engine.rootContext(), app)
     stockInfoController = stockInfoController.StockBasicInfoController(engine.rootContext(), app)
     # conditionController = conditionController.ConditionController(engine.rootContext(), app)
-    # candleChartController = candleChartController.CandleChartController(engine.rootContext(), app)
+    candleChartController = candleChartController.CandleChartController(engine.rootContext(), app)
     favoriteStockController = favoriteStockController.FavoriteStockController(engine.rootContext(), app)
 
     mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
-    # mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
+    mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
     # engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
@@ -74,16 +75,11 @@ if __name__ == "__main__":
     mainController.login()
 
     # conditionController.getConditionList()
-    # candleChartController.getDailyChart()
 
     realDataWorker.RealDataWorker.getInstance().start()
     main_window.closing.connect(realDataWorker.RealDataWorker.getInstance().putFinishMsg)
 
-    # webSocketServerThread = webSocketServer.WebSocketServerThread()
-    # webSocketServer = webSocketServer.WebSocketServer.getInstance()
-    #
-    # webSocketServer.moveToThread(webSocketServerThread)
-    # webSocketServerThread.started.connect(webSocketServer.run)
-    # webSocketServerThread.start()
+    # candleSocketServer.CandleSocketServer.getInstance().start()
+    # candleSocketServerTest.CandleSocketServerTest.getInstance().start()
 
     sys.exit(app.exec_())

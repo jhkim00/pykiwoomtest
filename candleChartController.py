@@ -1,8 +1,9 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
+import pandas as pd
 
 import pkm
-import webSocketServer
+import candleSocketServer
 
 logger = logging.getLogger()
 
@@ -62,5 +63,7 @@ class CandleChartController(QObject):
         new_column_names = {'종목코드': 'code', '현재가': 'close', '거래량': 'volume', '거래대금': 'transaction_amount',
                             '일자': 'date', '시가': 'open', '고가': 'high', '저가': 'low'}
         data_ = data_.rename(columns=new_column_names)
+        data_['date'] = pd.to_datetime(data_['date'], format='%Y%m%d')
         print(data_)
-        webSocketServer.WebSocketServer.getInstance().putData(data_)
+
+        # candleSocketServer.CandleSocketServer.getInstance().putData(data_)
