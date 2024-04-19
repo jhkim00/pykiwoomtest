@@ -204,9 +204,9 @@ class Kiwoom:
             self.chejan_dqueue.put(output)
 
     def OnReceiveRealData(self, code, rtype, data):
-        logger.debug(f'code: {code}')
-        logger.debug(f'rtype: {rtype}')
-        logger.debug(f'data: {data}')
+        # logger.debug(f'code: {code}')
+        # logger.debug(f'rtype: {rtype}')
+        # logger.debug(f'data: {data}')
         """실시간 데이터를 받는 시점에 콜백되는 메소드입니다.
 
         Args:

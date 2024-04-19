@@ -42,6 +42,7 @@ Rectangle {
         height: parent.height
         anchors.verticalCenter: parent.verticalCenter
 
+        property var code: modelData['code']
         property var priceInfo: modelData['priceInfo']
         property string startPrice: ''
         property string highPrice: ''
@@ -61,27 +62,35 @@ Rectangle {
 
         function updatePriceInfo() {
             console.log('updatePriceInfo')
-            if (priceInfo !== undefined) {
-                console.log('priceInfo !== undefined')
+            if (priceInfo !== null && priceInfo !== undefined) {
+                console.log('priceInfo !== null && priceInfo !== undefined code: %1'.arg(modelData['code']))
                 onPriceInfoInfoChanged(priceInfo.info)
                 priceInfo.infoChanged.connect(onPriceInfoInfoChanged)
             }
         }
 
         function onPriceInfoInfoChanged(info) {
-            console.log('onInfoChanged')
-            startPrice = info['시가']
-            highPrice = info['고가']
-            lowPrice = info['저가']
-            currentPrice = info['현재가']
-            refPrice = info['기준가']
-            diffSign = info['대비기호']
-            diffPrice = info['전일대비']
-            diffRate = info['등락율']
-            volume = info['거래량']
-            volumeRate = info['거래대비']
+            console.log('onPriceInfoInfoChanged')
+            if (priceRow === null) {
+                console.log('onPriceInfoInfoChanged priceRow === null')
+                return
+            }
+            try {
+                priceRow.startPrice = info['시가']
+                priceRow.highPrice = info['고가']
+                priceRow.lowPrice = info['저가']
+                priceRow.currentPrice = info['현재가']
+                priceRow.refPrice = info['기준가']
+                priceRow.diffSign = info['대비기호']
+                priceRow.diffPrice = info['전일대비']
+                priceRow.diffRate = info['등락율']
+                priceRow.volume = info['거래량']
+                priceRow.volumeRate = info['거래대비']
 
-            priceColor = getPriceColor(currentPrice, refPrice)
+                priceRow.priceColor = getPriceColor(priceRow.currentPrice, priceRow.refPrice)
+            } catch (e) {
+                console.log('An error occurred: ' + e)
+            }
         }
 
         function numberStrToNonAbsFormated(numberStr) {

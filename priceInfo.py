@@ -20,7 +20,7 @@ class PriceInfo(QObject):
             '거래대비': ''
         }
 
-    infoChanged = pyqtSignal(dict)
+    infoChanged = pyqtSignal(QVariant)
 
     @pyqtProperty(QVariant)
     def info(self):

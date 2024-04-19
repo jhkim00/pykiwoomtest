@@ -48,9 +48,18 @@ class FavoriteStockController(QObject):
                 return
 
         dbHelper.DbHelper.getInstance().insertStockToTableFavorite(name, code)
+
+        km = pkm.pkm()
+        km.put_method(('SetRealRemove', '1001', 'ALL'))
+        result = km.get_method()
+        logger.debug(f'SetRealRemove result:{result}')
+
         stock = {'name': name, 'code': code}
         self._getStockPriceInfo(stock)
         self._favoriteList.append(stock)
+
+        self._getRealData()
+
         self.qmlContext.setContextProperty("favoriteList", self._favoriteList)
         self.favoriteStockChanged.emit()
 
@@ -64,10 +73,14 @@ class FavoriteStockController(QObject):
                 break
 
         km = pkm.pkm()
-        km.put_method(('SetRealRemove', '1001', code))
+        km.put_method(('SetRealRemove', '1001', 'ALL'))
         result = km.get_method()
         logger.debug(f'SetRealRemove result:{result}')
+
         self._favoriteList.remove(stockToRemove)
+
+        self._getRealData()
+
         self.qmlContext.setContextProperty("favoriteList", self._favoriteList)
         self.favoriteStockChanged.emit()
 
@@ -125,7 +138,7 @@ class FavoriteStockController(QObject):
             'screen': '1001',
             'code_list': [item['code'] for item in self._favoriteList],
             'fid_list': ['20', '10', '11', '12', '13', '16', '17', '18', '25', '30'],
-            "opt_type": 1
+            "opt_type": 0
         }
         km = pkm.pkm()
         km.put_real(real_cmd)
@@ -133,8 +146,10 @@ class FavoriteStockController(QObject):
     @pyqtSlot(dict)
     def _onRealData(self, data: dict):
         # logger.debug(data)
+        isIn = False
         for stock in self._favoriteList:
             if data['code'] == stock['code']:
+                isIn = True
                 if data['rtype'] == '주식체결':
                     _priceInfo = {
                         '시가': '',
@@ -157,9 +172,13 @@ class FavoriteStockController(QObject):
                     _priceInfo['저가'] = data['18']
                     _priceInfo['대비기호'] = data['25']
                     _priceInfo['거래대비'] = data['30']
-                    _priceInfo['기준가'] = stock['priceInfo']['기준가']
+                    _priceInfo['기준가'] = stock['priceInfo'].info['기준가']
 
                     logger.debug(f"code: {data['code']}")
                     logger.debug(_priceInfo)
 
                     stock['priceInfo'].info = _priceInfo
+                    break
+
+        if not isIn:
+            logger.debug(f"code: {data['code']} isIn:{isIn}")
