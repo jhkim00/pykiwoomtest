@@ -44,6 +44,7 @@ class ConditionController(QObject):
 
     def getConditionList(self):
         logger.debug('')
+        pkm.checkCollDown()
         km = pkm.pkm()
         cmd = {
             'func_name': 'GetConditionNameList'

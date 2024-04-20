@@ -34,8 +34,7 @@ class FavoriteStockController(QObject):
         logger.debug(stockList)
 
         for stock in stockList:
-            if self._getStockPriceInfo(stock):
-                time.sleep(0.2)
+            self._getStockPriceInfo(stock)
 
         self.favoriteList = stockList
 
@@ -118,6 +117,7 @@ class FavoriteStockController(QObject):
                 },
                 'output': ['시가', '고가', '저가', '현재가', '기준가', '대비기호', '전일대비', '등락율', '거래량', '거래대비']
             }
+            pkm.checkCollDown()
             km = pkm.pkm()
             km.put_tr(tr_cmd)
             data, remain = km.get_tr()

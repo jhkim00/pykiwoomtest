@@ -79,7 +79,8 @@ if __name__ == "__main__":
     realDataWorker.RealDataWorker.getInstance().start()
     main_window.closing.connect(realDataWorker.RealDataWorker.getInstance().putFinishMsg)
 
-    # candleSocketServer.CandleSocketServer.getInstance().start()
+    candleSocketServer.CandleSocketServer.getInstance().start()
+    main_window.closing.connect(candleSocketServer.CandleSocketServer.getInstance().putFinishMsg)
     # candleSocketServerTest.CandleSocketServerTest.getInstance().start()
 
     sys.exit(app.exec_())

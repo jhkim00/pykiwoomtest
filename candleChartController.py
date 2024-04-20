@@ -54,6 +54,7 @@ class CandleChartController(QObject):
             'output': ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분',
                        '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
         }
+        pkm.checkCollDown()
         km = pkm.pkm()
         km.put_tr(tr_cmd)
         data, remain = km.get_tr()
@@ -63,7 +64,7 @@ class CandleChartController(QObject):
         new_column_names = {'종목코드': 'code', '현재가': 'close', '거래량': 'volume', '거래대금': 'transaction_amount',
                             '일자': 'date', '시가': 'open', '고가': 'high', '저가': 'low'}
         data_ = data_.rename(columns=new_column_names)
-        data_['date'] = pd.to_datetime(data_['date'], format='%Y%m%d')
+        data_['date'] = pd.to_datetime(data_['date'], format='%Y%m%d').astype(str)
         print(data_)
 
-        # candleSocketServer.CandleSocketServer.getInstance().putData(data_)
+        candleSocketServer.CandleSocketServer.getInstance().putData(data_)

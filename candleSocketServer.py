@@ -1,19 +1,19 @@
+from PyQt5.QtCore import QThread, pyqtSlot
 from flask import Flask
 from flask_socketio import SocketIO
 import logging
-import random
 import time
-from datetime import datetime, timedelta
 from threading import Thread
 import queue
 
 logger = logging.getLogger()
 
 
-class CandleSocketServer:
+class CandleSocketServer(QThread):
     instance = None
 
     def __init__(self):
+        super().__init__()
         self.app = Flask(__name__)
         self.socketio = SocketIO(self.app, cors_allowed_origins='*')
         self.thread = Thread(target=self.send_candle_data)
@@ -31,7 +31,7 @@ class CandleSocketServer:
             cls.instance = CandleSocketServer()
         return cls.instance
 
-    def start(self):
+    def run(self):
         self.thread.start()
         self.socketio.run(self.app, allow_unsafe_werkzeug=True, host='localhost', port=5000)
 
@@ -42,14 +42,19 @@ class CandleSocketServer:
     # 클라이언트에 캔들데이터 전송
     def send_candle_data(self):
         while True:
-            # candle_data = self.generate_candle_data()
-            # self.socketio.emit('candle_data', candle_data)  # 클라이언트에 캔들데이터 전송
-            # time.sleep(0.4)  # 0.4초마다 새로운 캔들차트 데이터 전송
-
             logger.debug('!!!!!!!!!!!!')
-            # data = self._queue.get()
+            data = self._queue.get()
             # logger.debug(data)
-            # self.socketio.emit('candle_data', data)
-            # logger.debug('@@@@@@@@@@@@')
+            if type(data) == 'str' and data == 'finish':
+                logger.debug('finish!!!!!!!!!!')
+                break
+            jsonData = data.to_json(orient='records')
+            # logger.debug(jsonData)
+            self.socketio.emit('candle_data', jsonData)
+            logger.debug('@@@@@@@@@@@@')
             time.sleep(1)
+
+    @pyqtSlot()
+    def putFinishMsg(self):
+        self._queue.put('finish')
 

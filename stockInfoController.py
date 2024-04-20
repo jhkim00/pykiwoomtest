@@ -109,6 +109,7 @@ class StockBasicInfoController(QObject):
             },
             'output': list(self._basicInfo.keys()) + list(self._priceInfo.keys())
         }
+        pkm.checkCollDown()
         km = pkm.pkm()
         km.put_tr(tr_cmd)
         data, remain = km.get_tr()

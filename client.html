@@ -8,20 +8,20 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <h1>Real-time Candlestick Chart</h1>
-    <div id="connectionStatus"></div>
+<!--    <h1>Real-time Candlestick Chart</h1>-->
+<!--    <div id="connectionStatus"></div>-->
     <div id="candleChart"  style="width: 100%; height: 600px;"></div>
     <script>
         var socket = io('http://localhost:5000');
 
         socket.on('connect', function() {
             console.log('Connected to server');
-            document.getElementById('connectionStatus').innerText = 'Connected';
+<!--            document.getElementById('connectionStatus').innerText = 'Connected';-->
         });
 
         socket.on('disconnect', function() {
             console.log('Disconnected from server');
-            document.getElementById('connectionStatus').innerText = 'Disconnected';
+<!--            document.getElementById('connectionStatus').innerText = 'Disconnected';-->
         });
 
         function drawCandleChart(data) {
@@ -59,7 +59,8 @@
         socket.on('candle_data', function(data) {
             // 캔들차트 그리기 함수 호출
             //console.log(data)
-            drawCandleChart(data);
+            var parsedData = JSON.parse(data).reverse();
+            drawCandleChart(parsedData);
         });
     </script>
 </body>
