@@ -19,6 +19,6 @@ def pkm():
 def checkCollDown():
     global _coolDown
     if _coolDown is None:
-        _coolDown = coolDown.CoolDown(limit=1, interval=0.4)
+        _coolDown = coolDown.CoolDown(limit=1, interval=0.3)
 
     _coolDown.call()

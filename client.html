@@ -24,7 +24,7 @@
 <!--            document.getElementById('connectionStatus').innerText = 'Disconnected';-->
         });
 
-        function drawCandleChart(data) {
+        function drawCandleChart(name, data) {
             // 캔들차트를 그릴 데이터 포맷
             var plotData = [{
                 type: 'candlestick',
@@ -34,14 +34,15 @@
                 low: data.map(item => item.low),  // 저가
                 close: data.map(item => item.close)  // 종가
             }];
-            console.log('Open:', plotData[0].open);
-            console.log('High:', plotData[0].high);
-            console.log('Low:', plotData[0].low);
-            console.log('Close:', plotData[0].close);
+            console.log('Open:', data);
+<!--            console.log('Open:', plotData[0].open);-->
+<!--            console.log('High:', plotData[0].high);-->
+<!--            console.log('Low:', plotData[0].low);-->
+<!--            console.log('Close:', plotData[0].close);-->
 
             // 캔들차트 레이아웃 설정
             var layout = {
-                title: 'Candlestick Chart',
+                title: name,
                 xaxis: {
                     title: 'Date',  // X축 제목
                     type: 'category'  // X축 타입: 날짜
@@ -51,7 +52,6 @@
                 }
             };
 
-            // 캔들차트 그리기
             Plotly.newPlot('candleChart', plotData, layout);
         }
 
@@ -59,8 +59,9 @@
         socket.on('candle_data', function(data) {
             // 캔들차트 그리기 함수 호출
             //console.log(data)
-            var parsedData = JSON.parse(data).reverse();
-            drawCandleChart(parsedData);
+            var parsedData = JSON.parse(data);
+            var name = parsedData[0]['name']
+            drawCandleChart(name, parsedData.reverse());
         });
     </script>
 </body>
