@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
+from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal, QVariant
 import logging
 
 import pkm

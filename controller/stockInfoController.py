@@ -1,8 +1,8 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 
+from model import realDataWorker
 import pkm
-import realDataWorker
 
 logger = logging.getLogger()
 

@@ -1,7 +1,5 @@
-import sys
 import logging
-import time
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 import pkm
 
 logger = logging.getLogger()

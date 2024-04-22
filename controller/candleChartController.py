@@ -2,8 +2,8 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 import pandas as pd
 
+from model import candleSocketServer
 import pkm
-import candleSocketServer
 
 logger = logging.getLogger()
 

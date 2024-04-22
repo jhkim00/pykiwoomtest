@@ -4,21 +4,13 @@ from PyQt5.QtQuick import QQuickView
 # from PyQt5.QtQuick import QQuickWindow
 
 from PyQt5.QtQml import QQmlApplicationEngine
-from PyQt5.QtCore import Qt
 
 import sys
 import logging
-import time
 from functools import partial
 
-import mainController
-import conditionController
-import stockInfoController
-import candleChartController
-import favoriteStockController
-import realDataWorker
-import candleSocketServer
-import candleSocketServerTest
+from controller import MainController, CandleChartController, FavoriteStockController, StockBasicInfoController
+from model import CandleSocketServer, RealDataWorker
 
 logger = logging.getLogger()
 
@@ -54,11 +46,11 @@ if __name__ == "__main__":
     engine = QQmlApplicationEngine()
     engine.warnings.connect(_handleQmlWarnings)
 
-    mainController = mainController.MainController(engine.rootContext(), app)
-    stockInfoController = stockInfoController.StockBasicInfoController(engine.rootContext(), app)
-    # conditionController = conditionController.ConditionController(engine.rootContext(), app)
-    candleChartController = candleChartController.CandleChartController(engine.rootContext(), app)
-    favoriteStockController = favoriteStockController.FavoriteStockController(engine.rootContext(), app)
+    mainController = MainController(engine.rootContext(), app)
+    stockInfoController = StockBasicInfoController(engine.rootContext(), app)
+    # conditionController = ConditionController(engine.rootContext(), app)
+    candleChartController = CandleChartController(engine.rootContext(), app)
+    favoriteStockController = FavoriteStockController(engine.rootContext(), app)
 
     mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
     mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
@@ -76,11 +68,11 @@ if __name__ == "__main__":
 
     # conditionController.getConditionList()
 
-    realDataWorker.RealDataWorker.getInstance().start()
-    main_window.closing.connect(realDataWorker.RealDataWorker.getInstance().putFinishMsg)
+    RealDataWorker.getInstance().start()
+    main_window.closing.connect(RealDataWorker.getInstance().putFinishMsg)
 
-    candleSocketServer.CandleSocketServer.getInstance().start()
-    main_window.closing.connect(candleSocketServer.CandleSocketServer.getInstance().putFinishMsg)
+    CandleSocketServer.getInstance().start()
+    main_window.closing.connect(CandleSocketServer.getInstance().putFinishMsg)
     # candleSocketServerTest.CandleSocketServerTest.getInstance().start()
 
     sys.exit(app.exec_())

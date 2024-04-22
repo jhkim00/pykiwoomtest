@@ -1,11 +1,8 @@
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 import logging
-import time
-import dbHelper
 
+from model import dbHelper, realDataWorker, priceInfo
 import pkm
-import realDataWorker
-import priceInfo
 
 logger = logging.getLogger()
 

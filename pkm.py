@@ -1,8 +1,6 @@
-import sys
 import logging
-from PyQt5.QtCore import QThread, pyqtSignal, QObject
 import kiwoom
-import coolDown
+from model.coolDown import CoolDown
 
 logger = logging.getLogger()
 _pkm = None
@@ -19,6 +17,6 @@ def pkm():
 def checkCollDown():
     global _coolDown
     if _coolDown is None:
-        _coolDown = coolDown.CoolDown(limit=1, interval=0.3)
+        _coolDown = CoolDown(limit=1, interval=0.3)
 
     _coolDown.call()
