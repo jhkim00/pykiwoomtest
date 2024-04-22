@@ -145,6 +145,27 @@ Rectangle {
 
         VerticalKeyValueLabel {
             width: 80
+            keyText: '현재가'
+            valueText: priceRow.numberStrToFormated(priceRow.currentPrice)
+            keyColor: 'black'
+            valueColor: priceRow.priceColor
+        }
+        VerticalKeyValueLabel {
+            width: 40
+            keyText: ''
+            valueText: priceRow.getDiffSignSymbol()
+            keyColor: 'black'
+            valueColor: priceRow.priceColor
+        }
+        VerticalKeyValueLabel {
+            width: 80
+            keyText: '등락률'
+            valueText: priceRow.numberStrToNonAbsFormated(priceRow.diffRate) + ' %'
+            keyColor: 'black'
+            valueColor: priceRow.priceColor
+        }
+        VerticalKeyValueLabel {
+            width: 80
             keyText: '시가'
             valueText: priceRow.numberStrToFormated(priceRow.startPrice)
             keyColor: 'black'
@@ -166,36 +187,15 @@ Rectangle {
         }
         VerticalKeyValueLabel {
             width: 80
-            keyText: '현재가'
-            valueText: priceRow.numberStrToFormated(priceRow.currentPrice)
-            keyColor: 'black'
-            valueColor: priceRow.priceColor
-        }
-        VerticalKeyValueLabel {
-            width: 80
             keyText: '기준가'
             valueText: priceRow.numberStrToFormated(priceRow.refPrice)
             keyColor: 'black'
             valueColor: 'black'
         }
         VerticalKeyValueLabel {
-            width: 40
-            keyText: ''
-            valueText: priceRow.getDiffSignSymbol()
-            keyColor: 'black'
-            valueColor: priceRow.priceColor
-        }
-        VerticalKeyValueLabel {
             width: 80
             keyText: '전일대비'
             valueText: priceRow.numberStrToFormated(priceRow.diffPrice)
-            keyColor: 'black'
-            valueColor: priceRow.priceColor
-        }
-        VerticalKeyValueLabel {
-            width: 80
-            keyText: '등락률'
-            valueText: priceRow.numberStrToNonAbsFormated(priceRow.diffRate) + ' %'
             keyColor: 'black'
             valueColor: priceRow.priceColor
         }

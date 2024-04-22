@@ -15,7 +15,7 @@ class FavoriteStockController(QObject):
 
         self._favoriteList = list()
 
-        self.loadFavoriteStock()
+        # self.loadFavoriteStock()
 
         realDataWorker.RealDataWorker.getInstance().data_received.connect(self._onRealData)
 

@@ -55,6 +55,17 @@ if __name__ == "__main__":
     mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
     mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
 
+    mainController.login()
+
+    # conditionController.getConditionList()
+
+    favoriteStockController.loadFavoriteStock()
+
+    if len(favoriteStockController.favoriteList) == 0:
+        mainController.currentStock = mainController.codeMasterList[0]
+    else:
+        mainController.currentStock = favoriteStockController.favoriteList[0]
+
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
     # engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
 
@@ -63,10 +74,6 @@ if __name__ == "__main__":
 
     main_window = engine.rootObjects()[0]
     main_window.closing.connect(partial(_onMainWindowClosed, main_window))
-
-    mainController.login()
-
-    # conditionController.getConditionList()
 
     RealDataWorker.getInstance().start()
     main_window.closing.connect(RealDataWorker.getInstance().putFinishMsg)

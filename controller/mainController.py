@@ -84,7 +84,7 @@ class MainController(QObject):
 
         # logger.debug(self._codeMasterList)
 
-        self.currentStock = self.codeMasterList[0]
+        # self.currentStock = self.codeMasterList[0]
         self.searchedStockList = self.codeMasterList
 
         self.qmlContext.setContextProperty('codeMasterList', self.codeMasterList)

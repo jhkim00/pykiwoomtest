@@ -88,11 +88,19 @@ Rectangle {
         }
     }
 
+    Component.onCompleted: {
+        console.log('StockInfo.qml Component.onCompleted.')
+        stockName = stockInfoController.currentStock['name']
+        stockCode = stockInfoController.currentStock['code']
+        stockInfoController.getBasicInfo()
+    }
+
     Connections {
         target: stockInfoController
         function onCurrentStockChanged() {
-            console.log('!!!!!!!!!!!onCurrentStockChanged: %1'.arg(stockInfoController.currentStock['name']))
-            console.log('!!!!!!!!!!!onCurrentStockChanged: %1'.arg(stockInfoController.currentStock['code']))
+            console.log('!!!!!!!!!!!onCurrentStockChanged: %1 %2'
+                        .arg(stockInfoController.currentStock['name'])
+                        .arg(stockInfoController.currentStock['code']))
 
             stockName = stockInfoController.currentStock['name']
             stockCode = stockInfoController.currentStock['code']
