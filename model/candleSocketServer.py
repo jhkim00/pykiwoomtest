@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThread, pyqtSlot
+from PyQt5.QtCore import QThread, pyqtSlot, pyqtSignal
 from flask import Flask
 from flask_socketio import SocketIO
 import logging
@@ -10,6 +10,7 @@ logger = logging.getLogger()
 
 
 class CandleSocketServer(QThread):
+    client_connected = pyqtSignal()
     instance = None
 
     def __init__(self):
@@ -24,6 +25,7 @@ class CandleSocketServer(QThread):
         @self.socketio.on('connect')
         def handle_connect():
             logger.debug('Client connected')
+            self.client_connected.emit()
 
     @classmethod
     def getInstance(cls):

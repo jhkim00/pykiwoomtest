@@ -2,7 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 import pandas as pd
 
-from model import candleSocketServer
+from model import CandleSocketServer
 import pkm
 
 logger = logging.getLogger()
@@ -15,6 +15,9 @@ class CandleChartController(QObject):
         self.qmlContext.setContextProperty('candleChartController', self)
 
         self._currentStock = {'code': '', 'name': ''}
+        self._dailyChart = None
+
+        CandleSocketServer.getInstance().client_connected.connect(self.onChartClientConnected)
 
     currentStockChanged = pyqtSignal(dict)
 
@@ -39,6 +42,12 @@ class CandleChartController(QObject):
         self.currentStock = stock
 
         self.getDailyChart()
+
+    @pyqtSlot()
+    def onChartClientConnected(self):
+        logger.debug('')
+        if self.currentStock['code'] != '' and self._dailyChart is not None:
+            CandleSocketServer.getInstance().putData(self._dailyChart)
 
     @pyqtSlot()
     def getDailyChart(self):
@@ -71,4 +80,6 @@ class CandleChartController(QObject):
         data_.loc[0, 'name'] = self.currentStock['name']
         print(data_)
 
-        candleSocketServer.CandleSocketServer.getInstance().putData(data_)
+        self._dailyChart = data_
+
+        CandleSocketServer.getInstance().putData(data_)

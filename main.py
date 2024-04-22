@@ -73,6 +73,5 @@ if __name__ == "__main__":
 
     CandleSocketServer.getInstance().start()
     main_window.closing.connect(CandleSocketServer.getInstance().putFinishMsg)
-    # candleSocketServerTest.CandleSocketServerTest.getInstance().start()
 
     sys.exit(app.exec_())
