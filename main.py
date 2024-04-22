@@ -9,8 +9,10 @@ import sys
 import logging
 from functools import partial
 
-from controller import MainController, CandleChartController, FavoriteStockController, StockBasicInfoController
+from controller import MainController, CandleChartController, FavoriteStockController, StockBasicInfoController,\
+                       ConditionController
 from model import CandleSocketServer, RealDataWorker
+import realConditionWorker
 
 logger = logging.getLogger()
 
@@ -48,7 +50,7 @@ if __name__ == "__main__":
 
     mainController = MainController(engine.rootContext(), app)
     stockInfoController = StockBasicInfoController(engine.rootContext(), app)
-    # conditionController = ConditionController(engine.rootContext(), app)
+    conditionController = ConditionController(engine.rootContext(), app)
     candleChartController = CandleChartController(engine.rootContext(), app)
     favoriteStockController = FavoriteStockController(engine.rootContext(), app)
 
@@ -67,7 +69,7 @@ if __name__ == "__main__":
         mainController.currentStock = favoriteStockController.favoriteList[0]
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
-    # engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
+    engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
 
     if not engine.rootObjects():
         sys.exit(-1)
@@ -78,6 +80,8 @@ if __name__ == "__main__":
     RealDataWorker.getInstance().start()
     main_window.closing.connect(RealDataWorker.getInstance().putFinishMsg)
 
+    realConditionWorker.RealConditionWorker.getInstance().start()
+    main_window.closing.connect(realConditionWorker.RealConditionWorker.getInstance().putFinishMsg)
     CandleSocketServer.getInstance().start()
     main_window.closing.connect(CandleSocketServer.getInstance().putFinishMsg)
 

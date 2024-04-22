@@ -1,7 +1,8 @@
-from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal, QVariant
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 
 import pkm
+import realConditionWorker
 
 logger = logging.getLogger()
 
@@ -15,18 +16,35 @@ class ConditionController(QObject):
         self._currentCondition = {'code': '', 'name': ''}
         self._conditionList = list()
 
+        realConditionWorker.RealConditionWorker.getInstance().data_received.connect(self._onRealCondition)
+
     currentConditionChanged = pyqtSignal()
 
     @pyqtProperty(QVariant)
     def currentCondition(self):
+        logger.debug('')
         return self._currentCondition
 
     @currentCondition.setter
-    def currentCondition(self, condition: dict):
+    def currentCondition(self, condition: QVariant):
         logger.debug(f'condition: {condition}')
         if isinstance(condition, dict):
             self._currentCondition = condition
         else:
+            self._currentCondition = condition.toVariant()
+
+        logger.debug(f'self._currentCondition: {self._currentCondition}')
+        logger.debug(f"name: {self._currentCondition['name']}, code: {self._currentCondition['code']}")
+        self.currentConditionChanged.emit()
+
+    @pyqtSlot(QVariant)
+    def setCurrentCondition(self, condition: QVariant):
+        logger.debug(f'condition: {condition}')
+        if isinstance(condition, dict):
+            logger.debug('000')
+            self._currentCondition = condition
+        else:
+            logger.debug('111')
             self._currentCondition = condition.toVariant()
 
         logger.debug(f'self._currentCondition: {self._currentCondition}')
@@ -42,6 +60,7 @@ class ConditionController(QObject):
         self._conditionList = conditionList
         self.qmlContext.setContextProperty("conditionList", self._conditionList)
 
+    @pyqtSlot()
     def getConditionList(self):
         logger.debug('')
         pkm.checkCollDown()
@@ -59,4 +78,21 @@ class ConditionController(QObject):
 
         self.conditionList = conditionList
 
+    @pyqtSlot()
+    def getCondition(self):
+        logger.debug(f"name: {self._currentCondition['name']}, code: {self._currentCondition['code']}")
+        pkm.checkCollDown()
+        km = pkm.pkm()
+        cmd = {
+            'func_name': 'SendCondition',
+            'screen': '2000',
+            'cond_name': self._currentCondition['name'],
+            'index': int(self._currentCondition['code']),
+            'search': 1
+        }
+        km.put_cond(cmd)
+
+    @pyqtSlot(dict)
+    def _onRealCondition(self, data: dict):
+        logger.debug(data)
 
