@@ -23,7 +23,7 @@ class ConditionController(QObject):
 
     currentConditionChanged = pyqtSignal()
 
-    @pyqtProperty(QVariant)
+    @pyqtProperty(QVariant, notify=currentConditionChanged)
     def currentCondition(self):
         logger.debug('')
         return self._currentCondition
@@ -34,20 +34,6 @@ class ConditionController(QObject):
         if isinstance(condition, dict):
             self._currentCondition = condition
         else:
-            self._currentCondition = condition.toVariant()
-
-        logger.debug(f'self._currentCondition: {self._currentCondition}')
-        logger.debug(f"name: {self._currentCondition['name']}, code: {self._currentCondition['code']}")
-        self.currentConditionChanged.emit()
-
-    @pyqtSlot(QVariant)
-    def setCurrentCondition(self, condition: QVariant):
-        logger.debug(f'condition: {condition}')
-        if isinstance(condition, dict):
-            logger.debug('000')
-            self._currentCondition = condition
-        else:
-            logger.debug('111')
             self._currentCondition = condition.toVariant()
 
         logger.debug(f'self._currentCondition: {self._currentCondition}')

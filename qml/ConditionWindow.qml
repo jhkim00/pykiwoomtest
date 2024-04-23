@@ -12,17 +12,22 @@ ApplicationWindow {
     function setCurrentCondition(condition) {
         console.log("setCurrentCondition")
         if (typeof(condition) !== 'undefined') {
-            conditionController.currentCondtion = condition // 이 코드가 안먹혀서 할 수 없이 아래 코드 추가함....
-            conditionController.setCurrentCondition(condition)
+            conditionController.currentCondition = condition
+        }
+    }
 
-            var cond = conditionController.currentCondtion
+    Connections {
+        target: conditionController
+        function onCurrentConditionChanged() {
+            console.log("conditionController onCurrentConditionChanged.")
+            var cond = conditionController.currentCondition
             if (typeof(cond) !== 'undefined') {
                 console.log("conditionController.currentCondtion name:%1, code:%2".arg(cond["name"]).arg(cond["code"]))
+                conditionController.getCondition()
             }
             else {
                 console.log("conditionController.currentCondtion is undefined....")
             }
-            conditionController.getCondition()
         }
     }
 

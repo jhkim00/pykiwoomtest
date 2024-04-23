@@ -22,7 +22,7 @@ class PriceInfo(QObject):
 
     infoChanged = pyqtSignal(QVariant)
 
-    @pyqtProperty(QVariant)
+    @pyqtProperty(QVariant, notify=infoChanged)
     def info(self):
         return self._info
 

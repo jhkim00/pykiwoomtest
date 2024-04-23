@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QUrl, QObject, pyqtSlot
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQuick import QQuickView
 # from PyQt5.QtQuick import QQuickWindow
@@ -7,7 +7,6 @@ from PyQt5.QtQml import QQmlApplicationEngine
 
 import sys
 import logging
-from functools import partial
 
 from controller import MainController, CandleChartController, FavoriteStockController, StockBasicInfoController,\
                        ConditionController
@@ -17,20 +16,26 @@ import realConditionWorker
 logger = logging.getLogger()
 
 
+class WindowManager(QObject):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._windowList = list()
+
+    def add_window(self, window):
+        for win in self._windowList:
+            if win == window:
+                return
+        self._windowList.append(window)
+
+    @pyqtSlot()
+    def onMainWindowClosed(self):
+        for win in self._windowList:
+            win.close()
+
+
 def _handleQmlWarnings(warnings):
     for warning in warnings:
         print("QML Warning:", warning.toString())
-
-
-def _onMainWindowClosed(sender, close_):
-    logger.debug('')
-    for rootObj in engine.rootObjects():
-        if rootObj != sender:
-            print('onMainWindowClosed 1')
-            rootObj.close()
-        else:
-            print('onMainWindowClosed 2')
-            pass
 
 
 if __name__ == "__main__":
@@ -46,20 +51,21 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     engine = QQmlApplicationEngine()
+    engine2 = QQmlApplicationEngine()
     engine.warnings.connect(_handleQmlWarnings)
+    engine2.warnings.connect(_handleQmlWarnings)
 
     mainController = MainController(engine.rootContext(), app)
     stockInfoController = StockBasicInfoController(engine.rootContext(), app)
-    conditionController = ConditionController(engine.rootContext(), app)
     candleChartController = CandleChartController(engine.rootContext(), app)
     favoriteStockController = FavoriteStockController(engine.rootContext(), app)
+
+    conditionController = ConditionController(engine2.rootContext(), app)
 
     mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
     mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
 
     mainController.login()
-
-    # conditionController.getConditionList()
 
     favoriteStockController.loadFavoriteStock()
 
@@ -69,20 +75,25 @@ if __name__ == "__main__":
         mainController.currentStock = favoriteStockController.favoriteList[0]
 
     engine.load(QUrl.fromLocalFile("qml/Main.qml"))
-    engine.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
+    engine2.load(QUrl.fromLocalFile("qml/ConditionWindow.qml"))
 
-    if not engine.rootObjects():
+    if not engine.rootObjects() or not engine2.rootObjects():
         sys.exit(-1)
 
+    wm = WindowManager(app)
+
     main_window = engine.rootObjects()[0]
-    main_window.closing.connect(partial(_onMainWindowClosed, main_window))
+    condition_window = engine2.rootObjects()[0]
+    wm.add_window(condition_window)
+    main_window.closing.connect(wm.onMainWindowClosed)
 
     RealDataWorker.getInstance().start()
     main_window.closing.connect(RealDataWorker.getInstance().putFinishMsg)
 
-    realConditionWorker.RealConditionWorker.getInstance().start()
-    main_window.closing.connect(realConditionWorker.RealConditionWorker.getInstance().putFinishMsg)
     CandleSocketServer.getInstance().start()
     main_window.closing.connect(CandleSocketServer.getInstance().putFinishMsg)
+
+    realConditionWorker.RealConditionWorker.getInstance().start()
+    condition_window.closing.connect(realConditionWorker.RealConditionWorker.getInstance().putFinishMsg)
 
     sys.exit(app.exec_())

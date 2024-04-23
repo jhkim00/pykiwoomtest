@@ -19,9 +19,9 @@ class CandleChartController(QObject):
 
         CandleSocketServer.getInstance().client_connected.connect(self.onChartClientConnected)
 
-    currentStockChanged = pyqtSignal(dict)
+    currentStockChanged = pyqtSignal()
 
-    @pyqtProperty(QVariant)
+    @pyqtProperty(QVariant, notify=currentStockChanged)
     def currentStock(self):
         return self._currentStock
 
@@ -34,7 +34,7 @@ class CandleChartController(QObject):
             self._currentStock = stock.toVariant()
 
         logger.debug(f'self._currentStock: {self._currentStock}')
-        self.currentStockChanged.emit(self._currentStock)
+        self.currentStockChanged.emit()
 
     @pyqtSlot(dict)
     def onCurrentStockChanged(self, stock: dict):

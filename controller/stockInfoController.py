@@ -46,7 +46,7 @@ class StockBasicInfoController(QObject):
     basicInfoChanged = pyqtSignal()
     priceInfoChanged = pyqtSignal()
 
-    @pyqtProperty(QVariant)
+    @pyqtProperty(QVariant, notify=currentStockChanged)
     def currentStock(self):
         return self._currentStock
 
@@ -61,7 +61,7 @@ class StockBasicInfoController(QObject):
         logger.debug(f'self._currentStock: {self._currentStock}')
         self.currentStockChanged.emit()
 
-    @pyqtProperty(QVariant)
+    @pyqtProperty(QVariant, notify=basicInfoChanged)
     def basicInfo(self):
         return self._basicInfo
 
@@ -76,7 +76,7 @@ class StockBasicInfoController(QObject):
         logger.debug(f'self._basicInfo: {self._basicInfo}')
         self.basicInfoChanged.emit()
 
-    @pyqtProperty(QVariant)
+    @pyqtProperty(QVariant, notify=priceInfoChanged)
     def priceInfo(self):
         return self._priceInfo
 
