@@ -88,7 +88,7 @@ class StockBasicInfoController(QObject):
         else:
             self._priceInfo = price.toVariant()
 
-        logger.debug(f'self._priceInfo: {self._priceInfo}')
+        # logger.debug(f'self._priceInfo: {self._priceInfo}')
         self.priceInfoChanged.emit()
 
     @pyqtSlot(dict)

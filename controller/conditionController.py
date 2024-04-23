@@ -73,7 +73,7 @@ class ConditionController(QObject):
         conditionListRaw = km.get_cond(method=True)
         logger.debug(conditionListRaw)
         for conditionRaw in conditionListRaw:
-            cond = {'code': conditionRaw[0], 'name': conditionRaw[1]}
+            cond = {'code': conditionRaw[0], 'name': conditionRaw[1], 'stock': list()}
             conditionList.append(cond)
 
         self.conditionList = conditionList
@@ -92,7 +92,35 @@ class ConditionController(QObject):
         }
         km.put_cond(cmd)
 
+        data = km.get_cond()
+        logger.debug(data)
+        for condition in self._conditionList:
+            if int(data['cond_index']) == int(condition['code']):
+                for code in data['code_list']:
+                    km.put_method(('GetMasterCodeName', code))
+                    masterName = km.get_method()
+                    condition['stock'].append({'code': code, 'name': masterName})
+
+                logger.debug(condition)
+                break
+
     @pyqtSlot(dict)
     def _onRealCondition(self, data: dict):
         logger.debug(data)
+        km = pkm.pkm()
+        for condition in self._conditionList:
+            if int(data['cond_index']) == int(condition['code']):
+                if data['type'] == 'I':
+                    km.put_method(('GetMasterCodeName', data['code']))
+                    masterName = km.get_method()
+                    condition['stock'].append({'code': data['code'], 'name': masterName})
+                elif data['type'] == 'D':
+                    for stock in condition['stock']:
+                        if data['code'] == stock['code']:
+                            condition['stock'].remove(stock)
+                            break
+
+                logger.debug(condition)
+                break
+
 

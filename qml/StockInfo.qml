@@ -121,7 +121,7 @@ Rectangle {
             sinyongRate = stockInfoController.basicInfo['신용비율']
         }
         function onPriceInfoChanged() {
-            console.log('onPriceInfoChanged')
+//            console.log('onPriceInfoChanged')
 
             startPrice = stockInfoController.priceInfo['시가']
             highPrice = stockInfoController.priceInfo['고가']

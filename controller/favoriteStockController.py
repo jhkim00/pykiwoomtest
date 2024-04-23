@@ -171,8 +171,8 @@ class FavoriteStockController(QObject):
                     _priceInfo['거래대비'] = data['30']
                     _priceInfo['기준가'] = stock['priceInfo'].info['기준가']
 
-                    logger.debug(f"code: {data['code']}")
-                    logger.debug(_priceInfo)
+                    # logger.debug(f"code: {data['code']}")
+                    # logger.debug(_priceInfo)
 
                     stock['priceInfo'].info = _priceInfo
                     break

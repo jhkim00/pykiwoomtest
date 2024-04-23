@@ -35,4 +35,4 @@ class RealConditionWorker(QThread):
 
     @pyqtSlot()
     def putFinishMsg(self):
-        pkm.pkm().cond_dqueue.put('finish')
+        pkm.pkm().real_cond_dqueue.put('finish')

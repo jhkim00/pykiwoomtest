@@ -70,7 +70,7 @@ Rectangle {
         }
 
         function onPriceInfoInfoChanged(info) {
-            console.log('onPriceInfoInfoChanged')
+//            console.log('onPriceInfoInfoChanged')
             if (priceRow === null) {
                 console.log('onPriceInfoInfoChanged priceRow === null')
                 return
