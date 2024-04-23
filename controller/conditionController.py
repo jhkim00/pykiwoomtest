@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
+import threading
 
 import pkm
 import realConditionWorker
@@ -15,6 +16,8 @@ class ConditionController(QObject):
 
         self._currentCondition = {'code': '', 'name': ''}
         self._conditionList = list()
+        self._semaphore = threading.Semaphore(1)
+        self._realConditionList = list()
 
         realConditionWorker.RealConditionWorker.getInstance().data_received.connect(self._onRealCondition)
 
@@ -81,6 +84,16 @@ class ConditionController(QObject):
     @pyqtSlot()
     def getCondition(self):
         logger.debug(f"name: {self._currentCondition['name']}, code: {self._currentCondition['code']}")
+
+        for condition in self._realConditionList:
+            if int(self._currentCondition['code']) == int(condition['code']):
+                logger.debug(f"condition {self._currentCondition['name']} is already registered.")
+                return
+
+        self._realConditionList.append(self._currentCondition)
+
+        logger.debug(f"real condition list: {self._realConditionList}")
+
         pkm.checkCollDown()
         km = pkm.pkm()
         cmd = {
@@ -91,36 +104,38 @@ class ConditionController(QObject):
             'search': 1
         }
         km.put_cond(cmd)
-
         data = km.get_cond()
         logger.debug(data)
-        for condition in self._conditionList:
-            if int(data['cond_index']) == int(condition['code']):
-                for code in data['code_list']:
-                    km.put_method(('GetMasterCodeName', code))
-                    masterName = km.get_method()
-                    condition['stock'].append({'code': code, 'name': masterName})
+        with self._semaphore:
+            for condition in self._conditionList:
+                if int(data['cond_index']) == int(condition['code']):
+                    condition['stock'].clear()
+                    for code in data['code_list']:
+                        km.put_method(('GetMasterCodeName', code))
+                        masterName = km.get_method()
+                        condition['stock'].append({'code': code, 'name': masterName})
 
-                logger.debug(condition)
-                break
+                    logger.debug(condition)
+                    break
 
     @pyqtSlot(dict)
     def _onRealCondition(self, data: dict):
         logger.debug(data)
         km = pkm.pkm()
-        for condition in self._conditionList:
-            if int(data['cond_index']) == int(condition['code']):
-                if data['type'] == 'I':
-                    km.put_method(('GetMasterCodeName', data['code']))
-                    masterName = km.get_method()
-                    condition['stock'].append({'code': data['code'], 'name': masterName})
-                elif data['type'] == 'D':
-                    for stock in condition['stock']:
-                        if data['code'] == stock['code']:
-                            condition['stock'].remove(stock)
-                            break
+        with self._semaphore:
+            for condition in self._conditionList:
+                if int(data['cond_index']) == int(condition['code']):
+                    if data['type'] == 'I':
+                        km.put_method(('GetMasterCodeName', data['code']))
+                        masterName = km.get_method()
+                        condition['stock'].append({'code': data['code'], 'name': masterName})
+                    elif data['type'] == 'D':
+                        for stock in condition['stock']:
+                            if data['code'] == stock['code']:
+                                condition['stock'].remove(stock)
+                                break
 
-                logger.debug(condition)
-                break
+                    logger.debug(condition)
+                    break
 
 
