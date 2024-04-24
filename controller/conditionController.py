@@ -29,6 +29,12 @@ class ConditionController(QObject):
         self._conditionList = conditionList
         self.qmlContext.setContextProperty("conditionList", self._conditionList)
 
+    @pyqtSlot(str, result=list)
+    def getConditionStockList(self, conditionIndex):
+        for condition in self._conditionList:
+            if int(condition['code']) == int(conditionIndex):
+                return condition['stock']
+
     @pyqtSlot()
     def getConditionList(self):
         logger.debug('')
@@ -47,8 +53,8 @@ class ConditionController(QObject):
 
         self.conditionList = conditionList
 
-    @pyqtSlot(str)
-    def getCondition(self, conditionIndex: str):
+    @pyqtSlot(str, result=bool)
+    def registerCondition(self, conditionIndex: str):
         conditionName = ''
         for cond in self._conditionList:
             if int(cond['code']) == int(conditionIndex):
@@ -57,14 +63,14 @@ class ConditionController(QObject):
 
         if conditionName == '':
             logger.debug(f"condition {conditionIndex} is not found in condition list.")
-            return
+            return False
 
         logger.debug(f"name: {conditionName}, index: {conditionIndex}")
 
         for condition in self._realConditionList:
             if int(conditionIndex) == int(condition['code']):
                 logger.debug(f"condition {conditionName} is already registered.")
-                return
+                return False
 
         self._realConditionList.append({'name': conditionName, 'code': conditionIndex})
 
@@ -93,6 +99,8 @@ class ConditionController(QObject):
 
                     logger.debug(condition)
                     break
+
+        return True
 
     @pyqtSlot(dict)
     def _onRealCondition(self, data: dict):

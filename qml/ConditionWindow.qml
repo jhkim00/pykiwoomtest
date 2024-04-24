@@ -9,18 +9,61 @@ ApplicationWindow {
     height: 480
     title: "pykiwoomtest condition"
 
+    property var conditionStockListViewDict: {}
+    property var currentStockListView: null
+
     Component.onCompleted: {
         conditionController.getConditionList()
     }
 
+    function createConditionStockListView(name, index) {
+        console.log('createConditionStockListView ' + name + ', '+ index)
+        var conditionStockList = conditionController.getConditionStockList(index)
+        var componentInstance = stockPriceListViewComponent.createObject(root, { "x": 240, "model": conditionStockList })
+        return componentInstance
+    }
+
     ConditionListView {
+        id: conditionListView
         width: 240
         height: parent.height
         model: conditionList
 
         onItemClicked: {
-            console.log('onItemClicked ' + itemData['name'] + ', '+ itemData['code'])
-            conditionController.getCondition(itemData['code'])
+            console.log('conditionListView onItemClicked ' + itemData['name'] + ', '+ itemData['code'])
+            var newStockListView = null
+            if (conditionController.registerCondition(itemData['code'])) {
+                newStockListView = createConditionStockListView(itemData['name'], itemData['code'])
+                if (typeof(conditionStockListViewDict) === 'undefined') {
+                    console.log('conditionStockListViewDict is undefined... ???')
+                    root.conditionStockListViewDict = {}
+                }
+                conditionStockListViewDict[itemData['code']] = newStockListView
+            } else {
+                if (itemData['code'] in conditionStockListViewDict) {
+                    newStockListView = conditionStockListViewDict[itemData['code']]
+                }
+            }
+            if (newStockListView !== null) {
+                if (currentStockListView != null) {
+                    currentStockListView.visible = false
+                }
+                newStockListView.visible = true
+                currentStockListView = newStockListView
+            }
+        }
+    }
+
+    Component {
+        id: stockPriceListViewComponent
+        StockPriceListView {
+            width: parent.width - conditionListView.width
+            height: conditionListView.height
+
+            onItemClicked: {
+                console.log('onItemClicked ' + itemData['name'] + ', '+ itemData['code'])
+                mainController.currentStock = itemData
+            }
         }
     }
 }
