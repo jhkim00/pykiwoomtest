@@ -14,31 +14,11 @@ class ConditionController(QObject):
         self.qmlContext = qmlContext
         self.qmlContext.setContextProperty('conditionController', self)
 
-        self._currentCondition = {'code': '', 'name': ''}
         self._conditionList = list()
         self._semaphore = threading.Semaphore(1)
         self._realConditionList = list()
 
         realConditionWorker.RealConditionWorker.getInstance().data_received.connect(self._onRealCondition)
-
-    currentConditionChanged = pyqtSignal()
-
-    @pyqtProperty(QVariant, notify=currentConditionChanged)
-    def currentCondition(self):
-        logger.debug('')
-        return self._currentCondition
-
-    @currentCondition.setter
-    def currentCondition(self, condition: QVariant):
-        logger.debug(f'condition: {condition}')
-        if isinstance(condition, dict):
-            self._currentCondition = condition
-        else:
-            self._currentCondition = condition.toVariant()
-
-        logger.debug(f'self._currentCondition: {self._currentCondition}')
-        logger.debug(f"name: {self._currentCondition['name']}, code: {self._currentCondition['code']}")
-        self.currentConditionChanged.emit()
 
     @property
     def conditionList(self):
@@ -67,16 +47,26 @@ class ConditionController(QObject):
 
         self.conditionList = conditionList
 
-    @pyqtSlot()
-    def getCondition(self):
-        logger.debug(f"name: {self._currentCondition['name']}, code: {self._currentCondition['code']}")
+    @pyqtSlot(str)
+    def getCondition(self, conditionIndex: str):
+        conditionName = ''
+        for cond in self._conditionList:
+            if int(cond['code']) == int(conditionIndex):
+                conditionName = cond['name']
+                break
+
+        if conditionName == '':
+            logger.debug(f"condition {conditionIndex} is not found in condition list.")
+            return
+
+        logger.debug(f"name: {conditionName}, index: {conditionIndex}")
 
         for condition in self._realConditionList:
-            if int(self._currentCondition['code']) == int(condition['code']):
-                logger.debug(f"condition {self._currentCondition['name']} is already registered.")
+            if int(conditionIndex) == int(condition['code']):
+                logger.debug(f"condition {conditionName} is already registered.")
                 return
 
-        self._realConditionList.append(self._currentCondition)
+        self._realConditionList.append({'name': conditionName, 'code': conditionIndex})
 
         logger.debug(f"real condition list: {self._realConditionList}")
 
@@ -85,8 +75,8 @@ class ConditionController(QObject):
         cmd = {
             'func_name': 'SendCondition',
             'screen': '2000',
-            'cond_name': self._currentCondition['name'],
-            'index': int(self._currentCondition['code']),
+            'cond_name': conditionName,
+            'index': int(conditionIndex),
             'search': 1
         }
         km.put_cond(cmd)

@@ -9,28 +9,6 @@ ApplicationWindow {
     height: 480
     title: "pykiwoomtest condition"
 
-    function setCurrentCondition(condition) {
-        console.log("setCurrentCondition")
-        if (typeof(condition) !== 'undefined') {
-            conditionController.currentCondition = condition
-        }
-    }
-
-    Connections {
-        target: conditionController
-        function onCurrentConditionChanged() {
-            console.log("conditionController onCurrentConditionChanged.")
-            var cond = conditionController.currentCondition
-            if (typeof(cond) !== 'undefined') {
-                console.log("conditionController.currentCondtion name:%1, code:%2".arg(cond["name"]).arg(cond["code"]))
-                conditionController.getCondition()
-            }
-            else {
-                console.log("conditionController.currentCondtion is undefined....")
-            }
-        }
-    }
-
     Component.onCompleted: {
         conditionController.getConditionList()
     }
@@ -42,8 +20,7 @@ ApplicationWindow {
 
         onItemClicked: {
             console.log('onItemClicked ' + itemData['name'] + ', '+ itemData['code'])
-
-            root.setCurrentCondition(itemData)
+            conditionController.getCondition(itemData['code'])
         }
     }
 }
