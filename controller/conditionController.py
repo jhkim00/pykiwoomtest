@@ -9,6 +9,8 @@ logger = logging.getLogger()
 
 
 class ConditionController(QObject):
+    currentStockChanged = pyqtSignal(dict)
+
     def __init__(self, qmlContext, parent=None):
         super().__init__(parent)
         self.qmlContext = qmlContext
@@ -121,5 +123,10 @@ class ConditionController(QObject):
 
                     logger.debug(condition)
                     break
+
+    @pyqtSlot(str, str)
+    def onCurrentStock(self, name, code):
+        self.currentStockChanged.emit({'name': name, 'code': code})
+
 
 

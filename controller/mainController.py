@@ -34,13 +34,12 @@ class MainController(QObject):
         self._searchedStockList = stockList
         self.qmlContext.setContextProperty("searchedStockList", self._searchedStockList)
 
-    @pyqtProperty(QVariant)
+    @pyqtProperty(QVariant, notify=currentStockChanged)
     def currentStock(self):
         return self._currentStock
 
     @currentStock.setter
     def currentStock(self, stock: dict):
-        logger.debug(f'stock: {stock}')
         if isinstance(stock, dict):
             self._currentStock = stock
         else:
@@ -48,6 +47,11 @@ class MainController(QObject):
 
         logger.debug(f'self._currentStock: {self._currentStock}')
         self.currentStockChanged.emit(self._currentStock)
+
+    @pyqtSlot(dict)
+    def onCurrentStock(self, stock: dict):
+        logger.debug(f'stock: {stock}')
+        self.currentStock = stock
 
     @pyqtSlot()
     def login(self):

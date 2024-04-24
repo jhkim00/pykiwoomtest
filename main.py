@@ -65,6 +65,8 @@ if __name__ == "__main__":
     mainController.currentStockChanged.connect(stockInfoController.onCurrentStockChanged)
     mainController.currentStockChanged.connect(candleChartController.onCurrentStockChanged)
 
+    conditionController.currentStockChanged.connect(mainController.onCurrentStock)
+
     mainController.login()
 
     favoriteStockController.loadFavoriteStock()

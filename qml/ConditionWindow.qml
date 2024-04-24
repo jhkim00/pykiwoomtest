@@ -62,7 +62,7 @@ ApplicationWindow {
 
             onItemClicked: {
                 console.log('onItemClicked ' + itemData['name'] + ', '+ itemData['code'])
-                mainController.currentStock = itemData
+                conditionController.onCurrentStock(itemData['name'], itemData['code'])
             }
         }
     }
