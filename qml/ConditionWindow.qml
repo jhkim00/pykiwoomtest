@@ -23,6 +23,19 @@ ApplicationWindow {
         return componentInstance
     }
 
+    Connections {
+        target: conditionController
+        function onConditionStockChanged(conditionIndex) {
+            console.log('onConditionStockChanged ' + conditionIndex)
+            if (typeof(conditionStockListViewDict) !== 'undefined') {
+                var view = conditionStockListViewDict[conditionIndex]
+                if (typeof(view) !== 'undefined' && view === currentStockListView) {
+                    view.model = conditionController.getConditionStockList(conditionIndex)
+                }
+            }
+        }
+    }
+
     ConditionListView {
         id: conditionListView
         width: 240
@@ -36,7 +49,7 @@ ApplicationWindow {
                 newStockListView = createConditionStockListView(itemData['name'], itemData['code'])
                 if (typeof(conditionStockListViewDict) === 'undefined') {
                     console.log('conditionStockListViewDict is undefined... ???')
-                    root.conditionStockListViewDict = {}
+                    conditionStockListViewDict = {}
                 }
                 conditionStockListViewDict[itemData['code']] = newStockListView
             } else {

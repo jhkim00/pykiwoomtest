@@ -61,7 +61,7 @@ Rectangle {
         }
 
         function updatePriceInfo() {
-            console.log('updatePriceInfo')
+//            console.log('updatePriceInfo')
             if (priceInfo !== null && priceInfo !== undefined) {
                 console.log('priceInfo !== null && priceInfo !== undefined code: %1'.arg(modelData['code']))
                 onPriceInfoInfoChanged(priceInfo.info)
