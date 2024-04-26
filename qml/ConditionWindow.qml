@@ -5,7 +5,7 @@ import "./component"
 ApplicationWindow {
     id: root
     visible: true
-    width: 800
+    width: 1200
     height: 480
     title: "pykiwoomtest condition"
 

@@ -10,6 +10,18 @@ Rectangle {
 
     property var listView
 
+    function getPriceColor(price, refPrice) {
+        var nPrice = parseInt(price)
+        var nRef = parseInt(refPrice)
+        if (nPrice > nRef) {
+            return 'red'
+        }
+        if (nPrice < nRef) {
+            return 'blue'
+        }
+        return 'black'
+    }
+
     Item {
         x: 10
         width: parent.width - x
@@ -72,7 +84,7 @@ Rectangle {
         function onPriceInfoInfoChanged(info) {
 //            console.log('onPriceInfoInfoChanged')
             if (priceRow === null) {
-                console.log('onPriceInfoInfoChanged priceRow === null')
+//                console.log('onPriceInfoInfoChanged priceRow === null')
                 return
             }
             try {
@@ -89,7 +101,7 @@ Rectangle {
 
                 priceRow.priceColor = getPriceColor(priceRow.currentPrice, priceRow.refPrice)
             } catch (e) {
-                console.log('An error occurred: ' + e)
+                console.log('????? An error occurred: ' + e)
             }
         }
 
@@ -120,18 +132,6 @@ Rectangle {
             numberStr = numberStr.replace(/^[-+]/, '');
 
             return numberStrToNonAbsFormated(numberStr)
-        }
-
-        function getPriceColor(price, refPrice) {
-            var nPrice = parseInt(price)
-            var nRef = parseInt(refPrice)
-            if (nPrice > nRef) {
-                return 'red'
-            }
-            if (nPrice < nRef) {
-                return 'blue'
-            }
-            return 'black'
         }
 
         function getDiffSignSymbol() {
@@ -169,21 +169,21 @@ Rectangle {
             keyText: '시가'
             valueText: priceRow.numberStrToFormated(priceRow.startPrice)
             keyColor: 'black'
-            valueColor: priceRow.getPriceColor(priceRow.startPrice, priceRow.refPrice)
+            valueColor: getPriceColor(priceRow.startPrice, priceRow.refPrice)
         }
         VerticalKeyValueLabel {
             width: 80
             keyText: '고가'
             valueText: priceRow.numberStrToFormated(priceRow.highPrice)
             keyColor: 'black'
-            valueColor: priceRow.getPriceColor(priceRow.highPrice, priceRow.refPrice)
+            valueColor: getPriceColor(priceRow.highPrice, priceRow.refPrice)
         }
         VerticalKeyValueLabel {
             width: 80
             keyText: '저가'
             valueText: priceRow.numberStrToFormated(priceRow.lowPrice)
             keyColor: 'black'
-            valueColor: priceRow.getPriceColor(priceRow.lowPrice, priceRow.refPrice)
+            valueColor: getPriceColor(priceRow.lowPrice, priceRow.refPrice)
         }
         VerticalKeyValueLabel {
             width: 80
@@ -209,7 +209,7 @@ Rectangle {
             keyText: '거래대비'
             valueText: priceRow.numberStrToFormated(priceRow.volumeRate) + ' %'
             keyColor: 'black'
-            valueColor: priceRow.getPriceColor(priceRow.volumeRate, 100)
+            valueColor: getPriceColor(priceRow.volumeRate, 100)
         }
     }
     MouseArea {

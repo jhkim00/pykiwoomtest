@@ -177,5 +177,5 @@ class FavoriteStockController(QObject):
                     stock['priceInfo'].info = _priceInfo
                     break
 
-        if not isIn:
-            logger.debug(f"code: {data['code']} isIn:{isIn}")
+        # if not isIn:
+        #     logger.debug(f"code: {data['code']} isIn:{isIn}")
