@@ -4,7 +4,7 @@ import threading
 
 import pkm
 import realConditionWorker
-from model import realDataWorker, priceInfo
+from model import realDataWorker
 
 logger = logging.getLogger()
 

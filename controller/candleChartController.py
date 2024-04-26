@@ -1,8 +1,9 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 import pandas as pd
+import time
 
-from model import CandleSocketServer
+from model import CandleSocketServer, realDataWorker
 import pkm
 
 logger = logging.getLogger()
@@ -16,8 +17,10 @@ class CandleChartController(QObject):
 
         self._currentStock = {'code': '', 'name': ''}
         self._dailyChart = None
+        self._dailyChartUpdateTime = time.time()
 
         CandleSocketServer.getInstance().client_connected.connect(self.onChartClientConnected)
+        realDataWorker.RealDataWorker.getInstance().data_received.connect(self._onRealData)
 
     currentStockChanged = pyqtSignal()
 
@@ -83,3 +86,46 @@ class CandleChartController(QObject):
         self._dailyChart = data_
 
         CandleSocketServer.getInstance().putData(data_)
+
+    @pyqtSlot(dict)
+    def _onRealData(self, data: dict):
+        # logger.debug(data)
+        if self._dailyChart is None:
+            return
+
+        if data['code'] == self._currentStock['code']:
+            if data['rtype'] == '주식체결':
+                if time.time() - self._dailyChartUpdateTime < 1:
+                    return
+
+                _priceInfo = {
+                    'code': '',
+                    'close': '',
+                    'open': '',
+                    'high': '',
+                    'low': '',
+                    'volume': '',
+                    'transaction_amount': ''
+                }
+                _priceInfo['close'] = data['10']
+                _priceInfo['volume'] = data['13']
+                _priceInfo['transaction_amount'] = data['14']
+                _priceInfo['open'] = data['16']
+                _priceInfo['high'] = data['17']
+                _priceInfo['low'] = data['18']
+
+                logger.debug(f"before {self._dailyChart.iloc[0]}")
+
+                self._dailyChart.loc[0, 'close'] = _priceInfo['close']
+                self._dailyChart.loc[0, 'volume'] = _priceInfo['volume']
+                self._dailyChart.loc[0, 'transaction_amount'] = _priceInfo['transaction_amount']
+                self._dailyChart.loc[0, 'open'] = _priceInfo['open']
+                self._dailyChart.loc[0, 'high'] = _priceInfo['high']
+                self._dailyChart.loc[0, 'low'] = _priceInfo['low']
+
+                logger.debug(f"after {self._dailyChart.iloc[0]}")
+
+                CandleSocketServer.getInstance().putData(self._dailyChart)
+
+                self._dailyChartUpdateTime = time.time()
+

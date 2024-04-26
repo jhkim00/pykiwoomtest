@@ -38,7 +38,7 @@ class CandleSocketServer(QThread):
         self.socketio.run(self.app, allow_unsafe_werkzeug=True, host='localhost', port=5000)
 
     def putData(self, data):
-        logger.debug(data)
+        # logger.debug(data)
         self._queue.put(data)
 
     # 클라이언트에 캔들데이터 전송
@@ -53,8 +53,8 @@ class CandleSocketServer(QThread):
             jsonData = data.to_json(orient='records')
             # logger.debug(jsonData)
             self.socketio.emit('candle_data', jsonData)
-            logger.debug('@@@@@@@@@@@@')
-            time.sleep(1)
+            # logger.debug('@@@@@@@@@@@@')
+            time.sleep(0.1)
 
     @pyqtSlot()
     def putFinishMsg(self):

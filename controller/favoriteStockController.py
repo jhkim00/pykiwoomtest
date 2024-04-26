@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 import logging
 
-from model import dbHelper, realDataWorker, priceInfo
+from model import dbHelper, realDataWorker
 import pkm
 
 logger = logging.getLogger()

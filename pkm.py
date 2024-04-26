@@ -55,7 +55,7 @@ def getStockPriceRealData(screenNumber: str, conditionStockList: list):
         'real_type': '주식체결',
         'screen': screenNumber,
         'code_list': [item['code'] for item in conditionStockList],
-        'fid_list': ['20', '10', '11', '12', '13', '16', '17', '18', '25', '30'],
+        'fid_list': ['20', '10', '11', '12', '13', '14', '16', '17', '18', '25', '30'],
         "opt_type": 0
     }
     km = pkm()
