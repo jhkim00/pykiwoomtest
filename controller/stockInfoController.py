@@ -113,20 +113,12 @@ class StockBasicInfoController(QObject):
         km = pkm.pkm()
         km.put_tr(tr_cmd)
         data, remain = km.get_tr()
-        print(data)
+        # print(data)
 
         self.basicInfo = data.iloc[0, :len(self.basicInfo)].to_dict()
         self.priceInfo = data.iloc[0, len(self.basicInfo):].to_dict()
 
-        real_cmd = {
-            'func_name': "SetRealReg",
-            'real_type': '주식체결',
-            'screen': '1000',
-            'code_list': [self._currentStock['code']],
-            'fid_list': ['20', '10', '11', '12', '13', '16', '17', '18', '25', '30'],
-            "opt_type": 0
-        }
-        km.put_real(real_cmd)
+        pkm.getStockPriceRealData('1000', [self._currentStock])
 
     @pyqtSlot(dict)
     def _onRealData(self, data: dict):

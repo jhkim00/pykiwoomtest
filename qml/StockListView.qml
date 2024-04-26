@@ -43,7 +43,7 @@ ListView {
     delegate: Rectangle {
         id: listViewItem
         width: root.width
-        height: 50
+        height: 40
         border.color: 'black'
         border.width: 1
 

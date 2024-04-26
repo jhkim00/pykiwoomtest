@@ -4,7 +4,7 @@ import QtQuick.Controls.Styles 1.4
 
 Rectangle {
     id: root
-    height: 50
+    height: 40
     border.color: 'black'
     border.width: 1
 

@@ -31,11 +31,11 @@ class FavoriteStockController(QObject):
         logger.debug(stockList)
 
         for stock in stockList:
-            self._getStockPriceInfo(stock)
+            pkm.getStockPriceInfo('1001', stock)
 
         self.favoriteList = stockList
 
-        self._getRealData()
+        pkm.getStockPriceRealData('1001', self._favoriteList)
 
     @pyqtSlot(str, str)
     def add(self, name: str, code: str):
@@ -51,10 +51,10 @@ class FavoriteStockController(QObject):
         logger.debug(f'SetRealRemove result:{result}')
 
         stock = {'name': name, 'code': code}
-        self._getStockPriceInfo(stock)
+        pkm.getStockPriceInfo('1001', stock)
         self._favoriteList.append(stock)
 
-        self._getRealData()
+        pkm.getStockPriceRealData('1001', self._favoriteList)
 
         self.qmlContext.setContextProperty("favoriteList", self._favoriteList)
         self.favoriteStockChanged.emit()
@@ -75,7 +75,7 @@ class FavoriteStockController(QObject):
 
         self._favoriteList.remove(stockToRemove)
 
-        self._getRealData()
+        pkm.getStockPriceRealData('1001', self._favoriteList)
 
         self.qmlContext.setContextProperty("favoriteList", self._favoriteList)
         self.favoriteStockChanged.emit()
@@ -98,47 +98,6 @@ class FavoriteStockController(QObject):
         self.qmlContext.setContextProperty("favoriteList", self._favoriteList)
 
         self.favoriteStockChanged.emit()
-
-    @staticmethod
-    def _getStockPriceInfo(stock):
-        logger.debug('')
-        if 'priceInfo' not in stock:
-            logger.debug(f"priceInfo not in stock code: {stock['code']}")
-            tr_cmd = {
-                'rqname': "주식기본정보",
-                'trcode': 'opt10001',
-                'next': '0',
-                'screen': '1001',
-                'input': {
-                    "종목코드": stock['code']
-                },
-                'output': ['시가', '고가', '저가', '현재가', '기준가', '대비기호', '전일대비', '등락율', '거래량', '거래대비']
-            }
-            pkm.checkCollDown()
-            km = pkm.pkm()
-            km.put_tr(tr_cmd)
-            data, remain = km.get_tr()
-
-            _priceInfo = priceInfo.PriceInfo()
-            _priceInfo.info = data.iloc[0].to_dict()
-
-            stock['priceInfo'] = _priceInfo
-            return True
-
-        return False
-
-    def _getRealData(self):
-        logger.debug('')
-        real_cmd = {
-            'func_name': "SetRealReg",
-            'real_type': '주식체결',
-            'screen': '1001',
-            'code_list': [item['code'] for item in self._favoriteList],
-            'fid_list': ['20', '10', '11', '12', '13', '16', '17', '18', '25', '30'],
-            "opt_type": 0
-        }
-        km = pkm.pkm()
-        km.put_real(real_cmd)
 
     @pyqtSlot(dict)
     def _onRealData(self, data: dict):

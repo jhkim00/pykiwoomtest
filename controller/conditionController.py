@@ -107,9 +107,10 @@ class ConditionController(QObject):
                         condition['stock'].append({'code': code, 'name': masterName})
 
                     for stock in condition['stock']:
-                        self._getStockPriceInfo(stock)
+                        pkm.getStockPriceInfo('2000', stock)
 
-                    self._getRealData(condition['stock'])
+                    pkm.getStockPriceRealData('2000', condition['stock'])
+                    # self._getRealData(condition['stock'])
 
                     logger.debug(condition)
                     break
@@ -128,14 +129,15 @@ class ConditionController(QObject):
                         masterName = km.get_method()
                         stock = {'code': data['code'], 'name': masterName}
                         condition['stock'].append(stock)
-                        self._getStockPriceInfo(stock)
+                        pkm.getStockPriceInfo('2000', stock)
                     elif data['type'] == 'D':
                         for stock in condition['stock']:
                             if data['code'] == stock['code']:
                                 condition['stock'].remove(stock)
                                 break
 
-                    self._getRealData(condition['stock'])
+                    pkm.getStockPriceRealData('2000', condition['stock'])
+                    # self._getRealData(condition['stock'])
 
                     # logger.debug(condition)
                     self.conditionStockChanged.emit(condition['code'])
@@ -144,48 +146,6 @@ class ConditionController(QObject):
     @pyqtSlot(str, str)
     def onCurrentStock(self, name, code):
         self.currentStockChanged.emit({'name': name, 'code': code})
-
-    @staticmethod
-    def _getStockPriceInfo(stock):
-        logger.debug('')
-        if 'priceInfo' not in stock:
-            logger.debug(f"priceInfo not in stock code: {stock['code']}")
-            tr_cmd = {
-                'rqname': "주식기본정보",
-                'trcode': 'opt10001',
-                'next': '0',
-                'screen': '1001',
-                'input': {
-                    "종목코드": stock['code']
-                },
-                'output': ['시가', '고가', '저가', '현재가', '기준가', '대비기호', '전일대비', '등락율', '거래량', '거래대비']
-            }
-            pkm.checkCollDown()
-            km = pkm.pkm()
-            km.put_tr(tr_cmd)
-            data, remain = km.get_tr()
-
-            _priceInfo = priceInfo.PriceInfo()
-            _priceInfo.info = data.iloc[0].to_dict()
-
-            stock['priceInfo'] = _priceInfo
-            return True
-
-        return False
-
-    @staticmethod
-    def _getRealData(conditionStockList: list):
-        logger.debug('')
-        real_cmd = {
-            'func_name': "SetRealReg",
-            'real_type': '주식체결',
-            'screen': '2000',
-            'code_list': [item['code'] for item in conditionStockList],
-            'fid_list': ['20', '10', '11', '12', '13', '16', '17', '18', '25', '30'],
-            "opt_type": 0
-        }
-        km = pkm.pkm()
-        km.put_real(real_cmd)
 
     @pyqtSlot(dict)
     def _onRealData(self, data: dict):

@@ -21,7 +21,7 @@ Rectangle {
     TextField {
         id: textFieldInput
         width: parent.width
-        height: 50
+        height: 40
         placeholderText: "종목명 or 종목코드"
         textColor: 'black'
         style: TextFieldStyle {
