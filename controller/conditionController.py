@@ -60,6 +60,10 @@ class ConditionController(QObject):
 
     @pyqtSlot(str, result=bool)
     def registerCondition(self, conditionIndex: str):
+        if len(self._realConditionList) >= 10:
+            logger.warning('real condition can only register up to 10.')
+            return False
+
         conditionName = ''
         for cond in self._conditionList:
             if int(cond['code']) == int(conditionIndex):
