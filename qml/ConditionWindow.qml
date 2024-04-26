@@ -19,7 +19,7 @@ ApplicationWindow {
     function createConditionStockListView(name, index) {
         console.log('createConditionStockListView ' + name + ', '+ index)
         var conditionStockList = conditionController.getConditionStockList(index)
-        var componentInstance = stockPriceListViewComponent.createObject(root, { "x": 240, "model": conditionStockList })
+        var componentInstance = stockPriceListViewComponent.createObject(root, { "x": 240, "model": conditionStockList, "headerText": name })
         return componentInstance
     }
 
@@ -70,8 +70,26 @@ ApplicationWindow {
     Component {
         id: stockPriceListViewComponent
         StockPriceListView {
+            id: stockPriceListView
             width: parent.width - conditionListView.width
             height: conditionListView.height
+
+            property string headerText: ''
+
+            header: Rectangle {
+                width: stockPriceListView.width
+                height: 30
+                color: 'lightgray'
+                Text {
+                    id: headerTextItem
+                    anchors.verticalCenter: parent.verticalCenter
+                    leftPadding: 10
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: 'black'
+                    text: stockPriceListView.headerText
+                }
+            }
 
             onItemClicked: {
                 console.log('onItemClicked ' + itemData['name'] + ', '+ itemData['code'])
