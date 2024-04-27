@@ -21,17 +21,6 @@ Rectangle {
     property string yootongRate: ''
     property string sinyongRate: ''
 
-    property string startPrice: ''
-    property string highPrice: ''
-    property string lowPrice: ''
-    property string currentPrice: ''
-    property string refPrice: ''
-    property string diffSign: ''
-    property string diffPrice: ''
-    property string diffRate: ''
-    property string volume: ''
-    property string volumeRate: ''
-    property string priceColor: 'white'
     property bool isFavorite: false
 
     function updateFavorite() {
@@ -67,27 +56,6 @@ Rectangle {
         return numberStrToNonAbsFormated(numberStr)
     }
 
-    function getPriceColor(price, refPrice) {
-        var nPrice = parseInt(price)
-        var nRef = parseInt(refPrice)
-        if (nPrice > nRef) {
-            return 'red'
-        }
-        if (nPrice < nRef) {
-            return 'blue'
-        }
-        return 'white'
-    }
-
-    function getDiffSignSymbol() {
-        switch (diffSign) {
-        case '1': return "\u2b61"
-        case '2': return "\u25b2"
-        case '5': return "\u25bc"
-        default: return ""
-        }
-    }
-
     Component.onCompleted: {
         console.log('StockInfo.qml Component.onCompleted.')
         stockName = stockInfoController.currentStock['name']
@@ -119,24 +87,6 @@ Rectangle {
             yootongNumber = stockInfoController.basicInfo['유통주식']
             yootongRate = stockInfoController.basicInfo['유통비율']
             sinyongRate = stockInfoController.basicInfo['신용비율']
-        }
-        function onPriceInfoChanged() {
-//            console.log('onPriceInfoChanged')
-
-            startPrice = stockInfoController.priceInfo['시가']
-            highPrice = stockInfoController.priceInfo['고가']
-            lowPrice = stockInfoController.priceInfo['저가']
-            currentPrice = stockInfoController.priceInfo['현재가']
-            refPrice = stockInfoController.priceInfo['기준가']
-            diffSign = stockInfoController.priceInfo['대비기호']
-            diffPrice = stockInfoController.priceInfo['전일대비']
-            diffRate = stockInfoController.priceInfo['등락율']
-            volume = stockInfoController.priceInfo['거래량']
-            volumeRate = stockInfoController.priceInfo['거래대비']
-
-            priceColor = getPriceColor(currentPrice, refPrice)
-
-            updateFavorite()
         }
     }
 
@@ -245,60 +195,16 @@ Rectangle {
         }
     }
 
-    Row {
+    PriceWidget {
         id: priceInfo
         height: basicInfo.height
         anchors.top: basicInfo.bottom
         anchors.topMargin: 10
         anchors.left: basicInfo.left
 
-        VerticalKeyValueLabel {
-            keyText: '시가'
-            valueText: numberStrToFormated(startPrice)
-            valueColor: getPriceColor(startPrice, refPrice)
-        }
-        VerticalKeyValueLabel {
-            keyText: '고가'
-            valueText: numberStrToFormated(highPrice)
-            valueColor: getPriceColor(highPrice, refPrice)
-        }
-        VerticalKeyValueLabel {
-            keyText: '저가'
-            valueText: numberStrToFormated(lowPrice)
-            valueColor: getPriceColor(lowPrice, refPrice)
-        }
-        VerticalKeyValueLabel {
-            keyText: '현재가'
-            valueText: numberStrToFormated(currentPrice)
-            valueColor: priceColor
-        }
-        VerticalKeyValueLabel {
-            keyText: '기준가'
-            valueText: numberStrToFormated(refPrice)
-        }
-        VerticalKeyValueLabel {
-            keyText: '대비기호'
-            valueText: getDiffSignSymbol()
-            valueColor: priceColor
-        }
-        VerticalKeyValueLabel {
-            keyText: '전일대비'
-            valueText: numberStrToFormated(diffPrice)
-            valueColor: priceColor
-        }
-        VerticalKeyValueLabel {
-            keyText: '등락률'
-            valueText: numberStrToNonAbsFormated(diffRate) + ' %'
-            valueColor: priceColor
-        }
-        VerticalKeyValueLabel {
-            keyText: '거래량'
-            valueText: numberStrToFormated(volume)
-        }
-        VerticalKeyValueLabel {
-            keyText: '거래대비'
-            valueText: numberStrToFormated(volumeRate) + ' %'
-            valueColor: getPriceColor(volumeRate, 100)
-        }
+        textBasicColor: 'white'
+
+        code: stockCode
+        priceInfo: stockInfoController.priceInfo
     }
 }

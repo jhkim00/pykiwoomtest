@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
 import logging
 
-from model import realDataWorker
+from model import realDataWorker, priceInfo
 import pkm
 
 logger = logging.getLogger()
@@ -27,18 +27,7 @@ class StockBasicInfoController(QObject):
             '유통비율': ''
         }
 
-        self._priceInfo = {
-            '시가': '',
-            '고가': '',
-            '저가': '',
-            '현재가': '',
-            '기준가': '',
-            '대비기호': '',
-            '전일대비': '',
-            '등락율': '',
-            '거래량': '',
-            '거래대비': ''
-        }
+        self._priceInfo = priceInfo.PriceInfo()
 
         realDataWorker.RealDataWorker.getInstance().data_received.connect(self._onRealData)
 
@@ -80,17 +69,6 @@ class StockBasicInfoController(QObject):
     def priceInfo(self):
         return self._priceInfo
 
-    @priceInfo.setter
-    def priceInfo(self, price: dict):
-        # logger.debug(f'price: {price}')
-        if isinstance(price, dict):
-            self._priceInfo = price
-        else:
-            self._priceInfo = price.toVariant()
-
-        # logger.debug(f'self._priceInfo: {self._priceInfo}')
-        self.priceInfoChanged.emit()
-
     @pyqtSlot(dict)
     def onCurrentStockChanged(self, stock: dict):
         logger.debug(f'stock: {stock}')
@@ -107,7 +85,7 @@ class StockBasicInfoController(QObject):
             'input': {
                 "종목코드": self._currentStock['code']
             },
-            'output': list(self._basicInfo.keys()) + list(self._priceInfo.keys())
+            'output': list(self._basicInfo.keys()) + list(self._priceInfo.info.keys())
         }
         pkm.checkCollDown()
         km = pkm.pkm()
@@ -116,7 +94,7 @@ class StockBasicInfoController(QObject):
         # print(data)
 
         self.basicInfo = data.iloc[0, :len(self.basicInfo)].to_dict()
-        self.priceInfo = data.iloc[0, len(self.basicInfo):].to_dict()
+        self.priceInfo.info = data.iloc[0, len(self.basicInfo):].to_dict()
 
         pkm.getStockPriceRealData('1000', [self._currentStock])
 
@@ -147,4 +125,4 @@ class StockBasicInfoController(QObject):
                 _priceInfo['대비기호'] = data['25']
                 _priceInfo['거래대비'] = data['30']
 
-                self.priceInfo = _priceInfo
+                self.priceInfo.info = _priceInfo
