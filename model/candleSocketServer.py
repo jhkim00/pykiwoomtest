@@ -50,9 +50,13 @@ class CandleSocketServer(QThread):
             if type(data) == 'str' and data == 'finish':
                 logger.debug('finish!!!!!!!!!!')
                 break
-            jsonData = data.to_json(orient='records')
+
+            jsonData = data[1].to_json(orient='records')
             # logger.debug(jsonData)
-            self.socketio.emit('candle_data', jsonData)
+            if data[0] == "minute":
+                self.socketio.emit('minute_candle_data', jsonData)
+            elif data[0] == "day":
+                self.socketio.emit('day_candle_data', jsonData)
             # logger.debug('@@@@@@@@@@@@')
             time.sleep(0.1)
 

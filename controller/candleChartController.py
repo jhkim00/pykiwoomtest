@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtProperty, pyqtSignal, QVariant, QMetaObject
 import logging
 import pandas as pd
 import time
@@ -17,7 +17,8 @@ class CandleChartController(QObject):
 
         self._currentStock = {'code': '', 'name': ''}
         self._dailyChart = None
-        self._dailyChartUpdateTime = time.time()
+        self._minuteChart = None
+        self._chartUpdateTime = time.time()
 
         CandleSocketServer.getInstance().client_connected.connect(self.onChartClientConnected)
         realDataWorker.RealDataWorker.getInstance().data_received.connect(self._onRealData)
@@ -45,12 +46,16 @@ class CandleChartController(QObject):
         self.currentStock = stock
 
         self.getDailyChart()
+        self.getMinuteChart()
 
     @pyqtSlot()
     def onChartClientConnected(self):
         logger.debug('')
-        if self.currentStock['code'] != '' and self._dailyChart is not None:
-            CandleSocketServer.getInstance().putData(self._dailyChart)
+        if self.currentStock['code'] != '':
+            if self._dailyChart is not None:
+                CandleSocketServer.getInstance().putData(('day', self._dailyChart))
+            if self._minuteChart is not None:
+                CandleSocketServer.getInstance().putData(('minute', self._minuteChart))
 
     @pyqtSlot()
     def getDailyChart(self):
@@ -81,22 +86,62 @@ class CandleChartController(QObject):
         data_ = data_.rename(columns=new_column_names)
         data_['date'] = pd.to_datetime(data_['date'], format='%Y%m%d').astype(str)
         data_.loc[0, 'name'] = self.currentStock['name']
-        print(data_)
+        # print(data_)
 
         self._dailyChart = data_
 
-        CandleSocketServer.getInstance().putData(data_)
+        CandleSocketServer.getInstance().putData(('day', self._dailyChart))
+
+    @pyqtSlot()
+    def getMinuteChart(self):
+        logger.debug('')
+        tr_cmd = {
+            'rqname': "주식분봉차트",
+            'trcode': 'opt10080',
+            'next': '0',
+            'screen': '1001',
+            'input': {
+                "종목코드": self._currentStock['code'],
+                "틱범위": "1"
+            },
+            'output': ['현재가', '거래량', '체결시간', '시가', '고가', '저가']
+        }
+        pkm.checkCollDown()
+        km = pkm.pkm()
+        km.put_tr(tr_cmd)
+        data, remain = km.get_tr()
+        # print(data)
+        new_column_names = {'현재가': 'close', '거래량': 'volume', '체결시간': 'chegyeol_time',
+                            '시가': 'open', '고가': 'high', '저가': 'low'}
+        data_ = data.rename(columns=new_column_names)
+        data_['chegyeol_time'] = pd.to_datetime(data_['chegyeol_time'], format='%Y%m%d%H%M%S')\
+            .dt.strftime("%Y-%m-%d %H:%M")
+
+        def remove_sign(x):
+            import re
+            return re.sub(r'[+-]', '', x)
+        priceCols = ['close', 'open', 'high', 'low']
+        data_[priceCols] = data_[priceCols].applymap(remove_sign)
+        data_.loc[0, 'name'] = self.currentStock['name']
+        data_.loc[0, 'code'] = self.currentStock['code']
+        # print(data_)
+
+        self._minuteChart = data_
+
+        CandleSocketServer.getInstance().putData(('minute', self._minuteChart))
+        self._chartUpdateTime = time.time()
 
     @pyqtSlot(dict)
     def _onRealData(self, data: dict):
         import re
+        from datetime import datetime
         # logger.debug(data)
         if self._dailyChart is None:
             return
 
         if data['code'] == self._currentStock['code']:
             if data['rtype'] == '주식체결':
-                if time.time() - self._dailyChartUpdateTime < 1:
+                if time.time() - self._chartUpdateTime < 1:
                     return
 
                 _priceInfo = {
@@ -107,6 +152,7 @@ class CandleChartController(QObject):
                     'low': '',
                     'volume': '',
                     'transaction_amount': ''
+                    'chegyeol_time'
                 }
                 _priceInfo['close'] = re.sub(r'[+-]', '', data['10'])
                 _priceInfo['volume'] = data['13']
@@ -115,7 +161,13 @@ class CandleChartController(QObject):
                 _priceInfo['high'] = re.sub(r'[+-]', '', data['17'])
                 _priceInfo['low'] = re.sub(r'[+-]', '', data['18'])
 
-                logger.debug(f"before {self._dailyChart.iloc[0]}")
+                today_datetime = datetime.strptime(self._minuteChart.loc[0, 'chegyeol_time'], "%Y-%m-%d %H:%M")
+                hour = int(data['20'][:2])
+                minute = int(data['20'][2:4])
+                new_datetime = today_datetime.replace(hour=hour, minute=minute)
+                _priceInfo['chegyeol_time'] = new_datetime.strftime("%Y-%m-%d %H:%M")
+
+                # logger.debug(f"before {self._dailyChart.iloc[0]}")
 
                 self._dailyChart.loc[0, 'close'] = _priceInfo['close']
                 self._dailyChart.loc[0, 'volume'] = _priceInfo['volume']
@@ -124,9 +176,35 @@ class CandleChartController(QObject):
                 self._dailyChart.loc[0, 'high'] = _priceInfo['high']
                 self._dailyChart.loc[0, 'low'] = _priceInfo['low']
 
-                logger.debug(f"after {self._dailyChart.iloc[0]}")
+                # logger.debug(f"after {self._dailyChart.iloc[0]}")
 
-                CandleSocketServer.getInstance().putData(self._dailyChart)
+                CandleSocketServer.getInstance().putData(('day', self._dailyChart))
 
-                self._dailyChartUpdateTime = time.time()
+                # logger.debug(f"before {self._minuteChart.iloc[0]}")
+
+                time1 = datetime.strptime(self._minuteChart.loc[0, 'chegyeol_time'], "%Y-%m-%d %H:%M")
+                time2 = datetime.strptime(_priceInfo['chegyeol_time'], "%Y-%m-%d %H:%M")
+
+                logger.debug(f"_minuteChart time: {self._minuteChart.loc[0, 'chegyeol_time']}")
+                logger.debug(f"_priceInfo time: {_priceInfo['chegyeol_time']}")
+
+                if time1 != time2:
+                    logger.debug("chegyeol_time is changed")
+                    QMetaObject.invokeMethod(self, "getMinuteChart")
+                    return
+
+                self._minuteChart.loc[0, 'close'] = _priceInfo['close']
+                volumeStr = re.sub(r'[+-]', '', data['15'])
+                self._minuteChart.loc[0, 'volume'] = str(int(self._minuteChart.loc[0, 'volume']) + int(volumeStr))
+                if _priceInfo['close'] > self._minuteChart.loc[0, 'high']:
+                    self._minuteChart.loc[0, 'high'] = _priceInfo['close']
+                if _priceInfo['close'] < self._minuteChart.loc[0, 'low']:
+                    self._minuteChart.loc[0, 'low'] = _priceInfo['close']
+
+                logger.debug(f"after {self._minuteChart.iloc[0]}")
+
+                CandleSocketServer.getInstance().putData(('minute', self._minuteChart))
+
+                self._chartUpdateTime = time.time()
+
 

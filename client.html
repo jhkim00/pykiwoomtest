@@ -10,7 +10,8 @@
 <body>
 <!--    <h1>Real-time Candlestick Chart</h1>-->
 <!--    <div id="connectionStatus"></div>-->
-    <div id="candleChart"  style="width: 100%; height: 1000px;"></div>
+    <div id="dailyCandleChart"  style="width: 100%; height: 1000px;"></div>
+    <div id="minuteCandleChart"  style="width: 100%; height: 1000px;"></div>
     <script>
         var socket = io('http://localhost:5000');
 
@@ -79,23 +80,97 @@
             };
 
             // 캔들차트 및 거래량 바차트 그리기
-            Plotly.newPlot('candleChart', figure);
+            Plotly.newPlot('dailyCandleChart', figure);
             var dataLength = data.length;
             var startIndex = Math.max(0, dataLength - 200); // 시작 인덱스 계산
             var endIndex = dataLength;
             var update = {
                 'xaxis.range': [startIndex, endIndex],   // updates the xaxis range
             };
-            Plotly.relayout('candleChart', update);
+            Plotly.relayout('dailyCandleChart', update);
+        }
+
+        function drawMinuteCandleChart(name, data) {
+            // 캔들차트 데이터 설정
+            var candleData = {
+                type: 'candlestick',
+                x: data.map(item => item.chegyeol_time),
+                open: data.map(item => item.open),
+                high: data.map(item => item.high),
+                low: data.map(item => item.low),
+                close: data.map(item => item.close),
+                xaxis: 'x',
+                yaxis: 'y'
+            };
+
+            // 거래량 바차트 데이터 설정
+            var volumeData = {
+                type: 'bar',
+                x: data.map(item => item.chegyeol_time),
+                y: data.map(item => item.volume),
+                xaxis: 'x',
+                yaxis: 'y2'
+            };
+
+            // 캔들차트 및 거래량 바차트 레이아웃 설정
+            var layout = {
+                title: name,
+                xaxis: {
+                    title: 'Date',
+                    type: 'category',
+                    domain: [0, 1],
+                    rangeslider: { visible: true },
+                    showgrid: true
+                },
+                yaxis: {
+                    title: 'Price',
+                    domain: [0.4, 1]
+                },
+                yaxis2: {
+                    title: '거래량',
+                    domain: [0, 0.35],
+                    anchor: 'x'
+                },
+                grid: {
+                    rows: 2,
+                    columns: 1,
+                    pattern: 'independent'
+                }
+            };
+
+            // 캔들차트 및 거래량 바차트 데이터 설정
+            var figure = {
+                data: [candleData, volumeData],
+                layout: layout
+            };
+
+            // 캔들차트 및 거래량 바차트 그리기
+            Plotly.newPlot('minuteCandleChart', figure);
+            var dataLength = data.length;
+            var startIndex = Math.max(0, dataLength - 400); // 시작 인덱스 계산
+            var endIndex = dataLength;
+            var update = {
+                'xaxis.range': [startIndex, endIndex],   // updates the xaxis range
+            };
+            Plotly.relayout('minuteCandleChart', update);
         }
 
         // 서버에서 캔들데이터 수신 시 캔들차트 그리기
-        socket.on('candle_data', function(data) {
+        socket.on('day_candle_data', function(data) {
             // 캔들차트 그리기 함수 호출
             //console.log(data)
             var parsedData = JSON.parse(data);
             var name = parsedData[0]['name']
             drawCandleChart(name, parsedData.reverse());
+        });
+
+        // 서버에서 캔들데이터 수신 시 캔들차트 그리기
+        socket.on('minute_candle_data', function(data) {
+            // 캔들차트 그리기 함수 호출
+            //console.log(data)
+            var parsedData = JSON.parse(data);
+            var name = parsedData[0]['name']
+            drawMinuteCandleChart(name, parsedData.reverse());
         });
     </script>
 </body>
