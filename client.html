@@ -25,7 +25,7 @@
 <!--            document.getElementById('connectionStatus').innerText = 'Disconnected';-->
         });
 
-        function drawCandleChart(name, data) {
+        function drawCandleChart(name, close, open, high, low, data) {
             // 캔들차트 데이터 설정
             var candleData = {
                 type: 'candlestick',
@@ -49,7 +49,7 @@
 
             // 캔들차트 및 거래량 바차트 레이아웃 설정
             var layout = {
-                title: name,
+                title: name + " (현재가 " + close + ", 시가 " + open + ", 고가 " + high + ", 저가 " + low + ")",
                 xaxis: {
                     title: 'Date',
                     type: 'category',
@@ -90,7 +90,7 @@
             Plotly.relayout('dailyCandleChart', update);
         }
 
-        function drawMinuteCandleChart(name, data) {
+        function drawMinuteCandleChart(name, close, open, high, low, data) {
             // 캔들차트 데이터 설정
             var candleData = {
                 type: 'candlestick',
@@ -114,7 +114,7 @@
 
             // 캔들차트 및 거래량 바차트 레이아웃 설정
             var layout = {
-                title: name,
+                title: name + " (현재가 " + close + ", 시가 " + open + ", 고가 " + high + ", 저가 " + low + ")",
                 xaxis: {
                     title: 'Date',
                     type: 'category',
@@ -161,7 +161,11 @@
             //console.log(data)
             var parsedData = JSON.parse(data);
             var name = parsedData[0]['name']
-            drawCandleChart(name, parsedData.reverse());
+            var close = parsedData[0]['close']
+            var open = parsedData[0]['open']
+            var high = parsedData[0]['high']
+            var low = parsedData[0]['low']
+            drawCandleChart(name, close, open, high, low, parsedData.reverse());
         });
 
         // 서버에서 캔들데이터 수신 시 캔들차트 그리기
@@ -170,7 +174,11 @@
             //console.log(data)
             var parsedData = JSON.parse(data);
             var name = parsedData[0]['name']
-            drawMinuteCandleChart(name, parsedData.reverse());
+            var close = parsedData[0]['close']
+            var open = parsedData[0]['open']
+            var high = parsedData[0]['high']
+            var low = parsedData[0]['low']
+            drawMinuteCandleChart(name, close, open, high, low, parsedData.reverse());
         });
     </script>
 </body>

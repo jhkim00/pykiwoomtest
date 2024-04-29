@@ -45,6 +45,8 @@ class CandleChartController(QObject):
         logger.debug(f'stock: {stock}')
         self.currentStock = stock
 
+        CandleSocketServer.getInstance().clearData()
+
         self.getDailyChart()
         self.getMinuteChart()
 

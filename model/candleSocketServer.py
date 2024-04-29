@@ -41,6 +41,10 @@ class CandleSocketServer(QThread):
         # logger.debug(data)
         self._queue.put(data)
 
+    def clearData(self):
+        logger.debug('')
+        self._queue.queue.clear()
+
     # 클라이언트에 캔들데이터 전송
     def send_candle_data(self):
         while True:
