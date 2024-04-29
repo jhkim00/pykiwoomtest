@@ -108,7 +108,7 @@ class StockBasicInfoController(QObject):
                     '고가': '',
                     '저가': '',
                     '현재가': '',
-                    '기준가': self._priceInfo['기준가'],
+                    '기준가': self._priceInfo.info['기준가'],
                     '대비기호': '',
                     '전일대비': '',
                     '등락율': '',

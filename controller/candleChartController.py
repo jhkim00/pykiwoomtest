@@ -89,6 +89,7 @@ class CandleChartController(QObject):
 
     @pyqtSlot(dict)
     def _onRealData(self, data: dict):
+        import re
         # logger.debug(data)
         if self._dailyChart is None:
             return
@@ -107,12 +108,12 @@ class CandleChartController(QObject):
                     'volume': '',
                     'transaction_amount': ''
                 }
-                _priceInfo['close'] = data['10']
+                _priceInfo['close'] = re.sub(r'[+-]', '', data['10'])
                 _priceInfo['volume'] = data['13']
                 _priceInfo['transaction_amount'] = data['14']
-                _priceInfo['open'] = data['16']
-                _priceInfo['high'] = data['17']
-                _priceInfo['low'] = data['18']
+                _priceInfo['open'] = re.sub(r'[+-]', '', data['16'])
+                _priceInfo['high'] = re.sub(r'[+-]', '', data['17'])
+                _priceInfo['low'] = re.sub(r'[+-]', '', data['18'])
 
                 logger.debug(f"before {self._dailyChart.iloc[0]}")
 
