@@ -48,30 +48,37 @@
             };
 
             // 캔들차트 및 거래량 바차트 레이아웃 설정
-            var layout = {
-                title: name + " (현재가 " + close + ", 시가 " + open + ", 고가 " + high + ", 저가 " + low + ")",
-                xaxis: {
-                    title: 'Date',
-                    type: 'category',
-                    domain: [0, 1],
-                    rangeslider: { visible: true },
-                    showgrid: true
-                },
-                yaxis: {
-                    title: 'Price',
-                    domain: [0.4, 1]
-                },
-                yaxis2: {
-                    title: '거래대금',
-                    domain: [0, 0.35],
-                    anchor: 'x'
-                },
-                grid: {
-                    rows: 2,
-                    columns: 1,
-                    pattern: 'independent'
-                }
-            };
+            var layout
+            var chartElement = document.getElementById('dailyCandleChart');
+            if (chartElement && chartElement.layout) {
+                layout = chartElement.layout;
+                layout.title = name + " (현재가 " + close + ", 시가 " + open + ", 고가 " + high + ", 저가 " + low + ")"
+            } else {
+                layout = {
+                    title: name + " (현재가 " + close + ", 시가 " + open + ", 고가 " + high + ", 저가 " + low + ")",
+                    xaxis: {
+                        title: 'Date',
+                        type: 'category',
+                        domain: [0, 1],
+                        rangeslider: { visible: true },
+                        showgrid: true
+                    },
+                    yaxis: {
+                        title: 'Price',
+                        domain: [0.4, 1]
+                    },
+                    yaxis2: {
+                        title: '거래대금',
+                        domain: [0, 0.35],
+                        anchor: 'x'
+                    },
+                    grid: {
+                        rows: 2,
+                        columns: 1,
+                        pattern: 'independent'
+                    }
+                };
+            }
 
             // 캔들차트 및 거래량 바차트 데이터 설정
             var figure = {
@@ -80,14 +87,21 @@
             };
 
             // 캔들차트 및 거래량 바차트 그리기
-            Plotly.newPlot('dailyCandleChart', figure);
-            var dataLength = data.length;
-            var startIndex = Math.max(0, dataLength - 200); // 시작 인덱스 계산
-            var endIndex = dataLength;
-            var update = {
-                'xaxis.range': [startIndex, endIndex],   // updates the xaxis range
-            };
-            Plotly.relayout('dailyCandleChart', update);
+            if (chartElement !== null) {
+                // 이미 존재하는 차트일 경우, 업데이트
+                Plotly.react('dailyCandleChart', figure);
+            } else {
+                // 존재하지 않는 차트일 경우, 생성
+                Plotly.newPlot('dailyCandleChart', figure);
+
+                var dataLength = data.length;
+                var startIndex = Math.max(0, dataLength - 200); // 시작 인덱스 계산
+                var endIndex = dataLength;
+                var update = {
+                    'xaxis.range': [startIndex, endIndex],   // updates the xaxis range
+                };
+                Plotly.relayout('dailyCandleChart', update);
+            }
         }
 
         function drawMinuteCandleChart(name, close, open, high, low, data) {
@@ -113,30 +127,37 @@
             };
 
             // 캔들차트 및 거래량 바차트 레이아웃 설정
-            var layout = {
-                title: name + " (현재가 " + close + ", 시가 " + open + ", 고가 " + high + ", 저가 " + low + ")",
-                xaxis: {
-                    title: 'Date',
-                    type: 'category',
-                    domain: [0, 1],
-                    rangeslider: { visible: true },
-                    showgrid: true
-                },
-                yaxis: {
-                    title: 'Price',
-                    domain: [0.4, 1]
-                },
-                yaxis2: {
-                    title: '거래량',
-                    domain: [0, 0.35],
-                    anchor: 'x'
-                },
-                grid: {
-                    rows: 2,
-                    columns: 1,
-                    pattern: 'independent'
-                }
-            };
+            var layout
+            var chartElement = document.getElementById('minuteCandleChart');
+            if (chartElement && chartElement.layout) {
+                layout = chartElement.layout;
+                layout.title = name + " (현재가 " + close + ", 시가 " + open + ", 고가 " + high + ", 저가 " + low + ")"
+            } else {
+                layout = {
+                    title: name + " (현재가 " + close + ", 시가 " + open + ", 고가 " + high + ", 저가 " + low + ")",
+                    xaxis: {
+                        title: 'Date',
+                        type: 'category',
+                        domain: [0, 1],
+                        rangeslider: { visible: true },
+                        showgrid: true
+                    },
+                    yaxis: {
+                        title: 'Price',
+                        domain: [0.4, 1]
+                    },
+                    yaxis2: {
+                        title: '거래량',
+                        domain: [0, 0.35],
+                        anchor: 'x'
+                    },
+                    grid: {
+                        rows: 2,
+                        columns: 1,
+                        pattern: 'independent'
+                    }
+                };
+            }
 
             // 캔들차트 및 거래량 바차트 데이터 설정
             var figure = {
@@ -145,14 +166,21 @@
             };
 
             // 캔들차트 및 거래량 바차트 그리기
-            Plotly.newPlot('minuteCandleChart', figure);
-            var dataLength = data.length;
-            var startIndex = Math.max(0, dataLength - 400); // 시작 인덱스 계산
-            var endIndex = dataLength;
-            var update = {
-                'xaxis.range': [startIndex, endIndex],   // updates the xaxis range
-            };
-            Plotly.relayout('minuteCandleChart', update);
+            if (chartElement !== null) {
+                // 이미 존재하는 차트일 경우, 업데이트
+                Plotly.react('minuteCandleChart', figure);
+            } else {
+                // 존재하지 않는 차트일 경우, 생성
+                Plotly.newPlot('minuteCandleChart', figure);
+
+                var dataLength = data.length;
+                var startIndex = Math.max(0, dataLength - 400); // 시작 인덱스 계산
+                var endIndex = dataLength;
+                var update = {
+                    'xaxis.range': [startIndex, endIndex],   // updates the xaxis range
+                };
+                Plotly.relayout('minuteCandleChart', update);
+            }
         }
 
         // 서버에서 캔들데이터 수신 시 캔들차트 그리기
