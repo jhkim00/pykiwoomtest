@@ -24,6 +24,7 @@ Rectangle {
     property bool isFavorite: false
 
     function updateFavorite() {
+        console.log('updateFavorite')
         isFavorite = favoriteStockController.isFavoriteStock(stockCode)
     }
 
@@ -61,6 +62,7 @@ Rectangle {
         stockName = stockInfoController.currentStock['name']
         stockCode = stockInfoController.currentStock['code']
         stockInfoController.getBasicInfo()
+        updateFavorite()
     }
 
     Connections {
@@ -74,6 +76,7 @@ Rectangle {
             stockCode = stockInfoController.currentStock['code']
 
             stockInfoController.getBasicInfo()
+            updateFavorite()
         }
         function onBasicInfoChanged() {
             console.log('onBasicInfoChanged')
